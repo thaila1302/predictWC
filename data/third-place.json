@@ -1,0 +1,16 @@
+{
+  "stage": "third_place",
+  "matches": [
+    {
+      "id": "M103",
+      "matchNumber": 103,
+      "date": "2026-07-19",
+      "time": "04:00",
+      "homeTeam": "Loser M101",
+      "awayTeam": "Loser M102",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "upcoming"
+    }
+  ]
+}

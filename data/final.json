@@ -1,0 +1,16 @@
+{
+  "stage": "final",
+  "matches": [
+    {
+      "id": "M104",
+      "matchNumber": 104,
+      "date": "2026-07-20",
+      "time": "02:00",
+      "homeTeam": "Winner M101",
+      "awayTeam": "Winner M102",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "upcoming"
+    }
+  ]
+}

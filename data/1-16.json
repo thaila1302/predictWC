@@ -1,0 +1,181 @@
+{
+  "stage": "round_of_32",
+  "matches": [
+    {
+      "id": "M73",
+      "matchNumber": 73,
+      "date": "2026-06-29",
+      "time": "02:00",
+      "homeTeam": "A2",
+      "awayTeam": "B2",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "upcoming"
+    },
+    {
+      "id": "M74",
+      "matchNumber": 74,
+      "date": "2026-06-30",
+      "time": "03:30",
+      "homeTeam": "E1",
+      "awayTeam": "ABCDF3",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "upcoming"
+    },
+    {
+      "id": "M75",
+      "matchNumber": 75,
+      "date": "2026-06-30",
+      "time": "08:00",
+      "homeTeam": "F1",
+      "awayTeam": "C2",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "upcoming"
+    },
+    {
+      "id": "M76",
+      "matchNumber": 76,
+      "date": "2026-06-30",
+      "time": "00:00",
+      "homeTeam": "C1",
+      "awayTeam": "F2",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "upcoming"
+    },
+    {
+      "id": "M77",
+      "matchNumber": 77,
+      "date": "2026-07-01",
+      "time": "04:00",
+      "homeTeam": "I1",
+      "awayTeam": "CDFGH3",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "upcoming"
+    },
+    {
+      "id": "M78",
+      "matchNumber": 78,
+      "date": "2026-07-01",
+      "time": "00:00",
+      "homeTeam": "E2",
+      "awayTeam": "I2",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "upcoming"
+    },
+    {
+      "id": "M79",
+      "matchNumber": 79,
+      "date": "2026-07-01",
+      "time": "08:00",
+      "homeTeam": "A1",
+      "awayTeam": "CEFHI3",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "upcoming"
+    },
+    {
+      "id": "M80",
+      "matchNumber": 80,
+      "date": "2026-07-01",
+      "time": "23:00",
+      "homeTeam": "L1",
+      "awayTeam": "EHIJK3",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "upcoming"
+    },
+    {
+      "id": "M81",
+      "matchNumber": 81,
+      "date": "2026-07-03",
+      "time": "06:00",
+      "homeTeam": "K2",
+      "awayTeam": "L2",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "upcoming"
+    },
+    {
+      "id": "M82",
+      "matchNumber": 82,
+      "date": "2026-07-02",
+      "time": "07:00",
+      "homeTeam": "D1",
+      "awayTeam": "BEFIJ3",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "upcoming"
+    },
+    {
+      "id": "M83",
+      "matchNumber": 83,
+      "date": "2026-07-02",
+      "time": "03:00",
+      "homeTeam": "G1",
+      "awayTeam": "AEHIJ3",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "upcoming"
+    },
+    {
+      "id": "M84",
+      "matchNumber": 84,
+      "date": "2026-07-03",
+      "time": "02:00",
+      "homeTeam": "H1",
+      "awayTeam": "J2",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "upcoming"
+    },
+    {
+      "id": "M85",
+      "matchNumber": 85,
+      "date": "2026-07-03",
+      "time": "10:00",
+      "homeTeam": "B1",
+      "awayTeam": "EFGIJ3",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "upcoming"
+    },
+    {
+      "id": "M86",
+      "matchNumber": 86,
+      "date": "2026-07-04",
+      "time": "05:00",
+      "homeTeam": "J1",
+      "awayTeam": "H2",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "upcoming"
+    },
+    {
+      "id": "M87",
+      "matchNumber": 87,
+      "date": "2026-07-04",
+      "time": "08:30",
+      "homeTeam": "K1",
+      "awayTeam": "DEIJL3",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "upcoming"
+    },
+    {
+      "id": "M88",
+      "matchNumber": 88,
+      "date": "2026-07-04",
+      "time": "01:00",
+      "homeTeam": "D2",
+      "awayTeam": "G2",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "upcoming"
+    }
+  ]
+}

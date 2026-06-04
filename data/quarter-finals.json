@@ -1,0 +1,49 @@
+{
+  "stage": "quarter_finals",
+  "matches": [
+    {
+      "id": "M97",
+      "matchNumber": 97,
+      "date": "2026-07-10",
+      "time": "03:00",
+      "homeTeam": "Winner M89",
+      "awayTeam": "Winner M90",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "upcoming"
+    },
+    {
+      "id": "M98",
+      "matchNumber": 98,
+      "date": "2026-07-11",
+      "time": "02:00",
+      "homeTeam": "Winner M93",
+      "awayTeam": "Winner M94",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "upcoming"
+    },
+    {
+      "id": "M99",
+      "matchNumber": 99,
+      "date": "2026-07-12",
+      "time": "04:00",
+      "homeTeam": "Winner M91",
+      "awayTeam": "Winner M92",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "upcoming"
+    },
+    {
+      "id": "M100",
+      "matchNumber": 100,
+      "date": "2026-07-12",
+      "time": "08:00",
+      "homeTeam": "Winner M95",
+      "awayTeam": "Winner M96",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "upcoming"
+    }
+  ]
+}

@@ -1,0 +1,254 @@
+[
+  {
+    "label": "A",
+    "teams": [
+      {
+        "name": "Mexico",
+        "code": "MEX"
+      },
+      {
+        "name": "Nam Phi",
+        "code": "RSA"
+      },
+      {
+        "name": "Hàn Quốc",
+        "code": "KOR"
+      },
+      {
+        "name": "CH Séc",
+        "code": "CZE"
+      }
+    ]
+  },
+  {
+    "label": "B",
+    "teams": [
+      {
+        "name": "Canada",
+        "code": "CAN"
+      },
+      {
+        "name": "Bosnia & Herzegovina",
+        "code": "BIH"
+      },
+      {
+        "name": "Qatar",
+        "code": "QAT"
+      },
+      {
+        "name": "Thụy Sĩ",
+        "code": "SUI"
+      }
+    ]
+  },
+  {
+    "label": "C",
+    "teams": [
+      {
+        "name": "Brazil",
+        "code": "BRA"
+      },
+      {
+        "name": "Morocco",
+        "code": "MAR"
+      },
+      {
+        "name": "Haiti",
+        "code": "HAI"
+      },
+      {
+        "name": "Scotland",
+        "code": "SCO"
+      }
+    ]
+  },
+  {
+    "label": "D",
+    "teams": [
+      {
+        "name": "Mỹ",
+        "code": "USA"
+      },
+      {
+        "name": "Paraguay",
+        "code": "PAR"
+      },
+      {
+        "name": "Úc",
+        "code": "AUS"
+      },
+      {
+        "name": "Thổ Nhĩ Kỳ",
+        "code": "TUR"
+      }
+    ]
+  },
+  {
+    "label": "E",
+    "teams": [
+      {
+        "name": "Đức",
+        "code": "GER"
+      },
+      {
+        "name": "Curaçao",
+        "code": "CUW"
+      },
+      {
+        "name": "Bờ Biển Ngà",
+        "code": "CIV"
+      },
+      {
+        "name": "Ecuador",
+        "code": "ECU"
+      }
+    ]
+  },
+  {
+    "label": "F",
+    "teams": [
+      {
+        "name": "Hà Lan",
+        "code": "NED"
+      },
+      {
+        "name": "Nhật Bản",
+        "code": "JPN"
+      },
+      {
+        "name": "Thụy Điển",
+        "code": "SWE"
+      },
+      {
+        "name": "Tunisia",
+        "code": "TUN"
+      }
+    ]
+  },
+  {
+    "label": "G",
+    "teams": [
+      {
+        "name": "Bỉ",
+        "code": "BEL"
+      },
+      {
+        "name": "Ai Cập",
+        "code": "EGY"
+      },
+      {
+        "name": "Iran",
+        "code": "IRN"
+      },
+      {
+        "name": "New Zealand",
+        "code": "NZL"
+      }
+    ]
+  },
+  {
+    "label": "H",
+    "teams": [
+      {
+        "name": "Tây Ban Nha",
+        "code": "ESP"
+      },
+      {
+        "name": "Cabo Verde",
+        "code": "CPV"
+      },
+      {
+        "name": "Ả Rập Xê Út",
+        "code": "KSA"
+      },
+      {
+        "name": "Uruguay",
+        "code": "URU"
+      }
+    ]
+  },
+  {
+    "label": "I",
+    "teams": [
+      {
+        "name": "Pháp",
+        "code": "FRA"
+      },
+      {
+        "name": "Senegal",
+        "code": "SEN"
+      },
+      {
+        "name": "Iraq",
+        "code": "IRQ"
+      },
+      {
+        "name": "Na Uy",
+        "code": "NOR"
+      }
+    ]
+  },
+  {
+    "label": "J",
+    "teams": [
+      {
+        "name": "Argentina",
+        "code": "ARG"
+      },
+      {
+        "name": "Algeria",
+        "code": "ALG"
+      },
+      {
+        "name": "Áo",
+        "code": "AUT"
+      },
+      {
+        "name": "Jordan",
+        "code": "JOR"
+      }
+    ]
+  },
+  {
+    "label": "K",
+    "teams": [
+      {
+        "name": "Bồ Đào Nha",
+        "code": "POR"
+      },
+      {
+        "name": "CH Congo",
+        "code": "COD"
+      },
+      {
+        "name": "Uzbekistan",
+        "code": "UZB"
+      },
+      {
+        "name": "Colombia",
+        "code": "COL"
+      }
+    ]
+  },
+  {
+    "label": "L",
+    "teams": [
+      {
+        "name": "Anh",
+        "code": "ENG"
+      },
+      {
+        "name": "Croatia",
+        "code": "CRO"
+      },
+      {
+        "name": "Ghana",
+        "code": "GHA"
+      },
+      {
+        "name": "Panama",
+        "code": "PAN"
+      }
+    ]
+  }
+]
