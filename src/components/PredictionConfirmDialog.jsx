@@ -43,7 +43,7 @@ export default function PredictionConfirmDialog({
             <p className="mt-2 text-sm leading-6 text-slate-300">
               Bạn đang chọn <span className="font-bold text-white">{nextLabel}</span> cho trận{' '}
               <span className="font-bold text-white">
-                {homeLabel} vs {awayLabel}
+                {homeLabel} đấu với {awayLabel}
               </span>
               .
             </p>

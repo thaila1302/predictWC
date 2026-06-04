@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Check, Clock3, Search, Shield, Target, Users, X } from 'lucide-react';
-import SectionHeader from '../components/SectionHeader';
 import StatusBadge from '../components/StatusBadge';
 import DevMatchEditor from '../components/DevMatchEditor';
 import {
@@ -28,7 +27,7 @@ const PRIMARY_ADMIN_NAME = 'Lê Anh Thái';
 
 const adminTabs = [
   { id: 'matches', label: 'Trận đấu', icon: Shield },
-  { id: 'users', label: 'Quản lý user', icon: Users },
+  { id: 'users', label: 'Quản lý người dùng', icon: Users },
   { id: 'predictions', label: 'Kèo dự đoán', icon: Target }
 ];
 
@@ -91,6 +90,21 @@ function groupMatchesByDay(matches) {
 function getMatchMetaLabel(match) {
   if (match?.group) return `Bảng ${match.group}`;
   return match?.roundLabel || 'Loại trực tiếp';
+}
+
+function getMatchRoundFilter(match) {
+  if (match?.group) {
+    return { value: 'round:group-stage', label: 'Vòng bảng' };
+  }
+
+  const label = match?.roundLabel || 'Loại trực tiếp';
+  return { value: `round:${match?.round || label}`, label };
+}
+
+function getRoundFilterOrder(label) {
+  const order = ['Vòng bảng', '1/16', '1/8', 'Tứ kết', 'Bán kết', 'Hạng ba', 'Chung kết'];
+  const index = order.indexOf(label);
+  return index === -1 ? order.length : index;
 }
 
 function getPredictionLabel(predictedResult, match) {
@@ -160,7 +174,7 @@ function AdminMatchCard({ match }) {
   );
 }
 
-function AdminTabButton({ active, icon: Icon, label, onClick }) {
+function AdminTabButton({ active, icon: Icon, label, onClick, className = '' }) {
   return (
     <button
       type="button"
@@ -169,7 +183,8 @@ function AdminTabButton({ active, icon: Icon, label, onClick }) {
         'inline-flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold transition',
         active
           ? 'bg-gradient-to-r from-violet-400 to-cyan-400 text-slate-950'
-          : 'bg-white/5 text-slate-200 hover:bg-white/10'
+          : 'bg-white/5 text-slate-200 hover:bg-white/10',
+        className
       )}
     >
       <Icon size={16} />
@@ -248,6 +263,56 @@ function TogglePill({ enabled, onClick, disabled, trueLabel, falseLabel }) {
   );
 }
 
+function getMatchRoundOptions(matches) {
+  const map = new Map();
+  matches.forEach((match) => {
+    const option = getMatchRoundFilter(match);
+    if (!map.has(option.value)) {
+      map.set(option.value, option);
+    }
+  });
+
+  return Array.from(map.values()).sort((left, right) => {
+    const orderDiff = getRoundFilterOrder(left.label) - getRoundFilterOrder(right.label);
+    if (orderDiff !== 0) return orderDiff;
+    return left.label.localeCompare(right.label);
+  });
+}
+
+function MatchesTab({ matches, roundFilter }) {
+  const filteredMatches = useMemo(() => {
+    if (!roundFilter) return matches;
+    return matches.filter((match) => getMatchRoundFilter(match).value === roundFilter);
+  }, [matches, roundFilter]);
+
+  const sections = useMemo(() => groupMatchesByDay(filteredMatches), [filteredMatches]);
+
+  return (
+    <div className="space-y-5">
+      {sections.length === 0 ? (
+        <EmptyState title="Chưa có trận phù hợp" description="Thử chọn vòng đấu khác để xem danh sách trận." />
+      ) : (
+        sections.map((section) => (
+          <section
+            key={section.key}
+            className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-slate-950/70 shadow-glow ring-1 ring-white/5"
+          >
+            <div className="border-b border-white/10 bg-white/5 px-5 py-4">
+              <h2 className="font-display text-xl font-black text-white">{section.label}</h2>
+            </div>
+
+            <div className="grid items-start gap-4 p-4 md:grid-cols-2">
+              {section.matches.map((match) => (
+                <AdminMatchCard key={match.id} match={match} />
+              ))}
+            </div>
+          </section>
+        ))
+      )}
+    </div>
+  );
+}
+
 function UsersTab({ users, predictionCountByUser, currentUserId, onToggleAdmin, onToggleLocked }) {
   const [query, setQuery] = useState('');
   const [savingUserId, setSavingUserId] = useState('');
@@ -285,7 +350,7 @@ function UsersTab({ users, predictionCountByUser, currentUserId, onToggleAdmin, 
   return (
     <div className="space-y-5">
       <div className="grid gap-4 md:grid-cols-3">
-        <StatCard label="Tổng user" value={users.length} helper="Danh sách lấy trực tiếp từ Firebase users" />
+        <StatCard label="Tổng người dùng" value={users.length} helper="Danh sách lấy trực tiếp từ bộ sưu tập người dùng trên Firebase" />
         <StatCard
           label="Đã tham gia dự đoán"
           value={users.filter((user) => (predictionCountByUser.get(user.uid || user.id) || 0) > 0).length}
@@ -294,14 +359,14 @@ function UsersTab({ users, predictionCountByUser, currentUserId, onToggleAdmin, 
         <StatCard
           label="Tổng lượt chọn"
           value={Array.from(predictionCountByUser.values()).reduce((sum, count) => sum + count, 0)}
-          helper="Tổng số predictions của tất cả user"
+          helper="Tổng số dự đoán của tất cả người dùng"
         />
       </div>
 
       <SearchInput value={query} onChange={setQuery} placeholder="Tìm theo họ tên, tài khoản hoặc UID" />
 
       {filteredUsers.length === 0 ? (
-        <EmptyState title="Chưa có user phù hợp" description="Thử lại với từ khóa khác hoặc tạo thêm tài khoản để kiểm tra." />
+        <EmptyState title="Chưa có người dùng phù hợp" description="Thử lại với từ khóa khác hoặc tạo thêm tài khoản để kiểm tra." />
       ) : (
         <div className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-slate-950/70 shadow-glow ring-1 ring-white/5">
           <div className="overflow-x-auto">
@@ -312,7 +377,7 @@ function UsersTab({ users, predictionCountByUser, currentUserId, onToggleAdmin, 
                   <th className="px-4 py-4 font-semibold">Tài khoản</th>
                   <th className="px-4 py-4 font-semibold">Đúng / Sai</th>
                   <th className="px-4 py-4 font-semibold">Kèo</th>
-                  <th className="px-4 py-4 font-semibold">Admin</th>
+                  <th className="px-4 py-4 font-semibold">Quản trị</th>
                   <th className="px-4 py-4 font-semibold">Khóa</th>
                   <th className="px-4 py-4 font-semibold">UID</th>
                 </tr>
@@ -329,10 +394,10 @@ function UsersTab({ users, predictionCountByUser, currentUserId, onToggleAdmin, 
                       <td className="px-4 py-4">
                         <div className="font-semibold text-white">{user.displayName || 'Chưa đặt tên'}</div>
                         <div className="mt-1 text-xs text-slate-400">
-                          {isPrimaryAdmin ? 'Admin gốc' : user.isAdmin ? 'Đang là admin' : 'User thường'}
+                          {isPrimaryAdmin ? 'Quản trị gốc' : user.isAdmin ? 'Đang là quản trị' : 'Người dùng thường'}
                         </div>
                       </td>
-                      <td className="px-4 py-4 text-slate-200">@{user.username || 'no-username'}</td>
+                      <td className="px-4 py-4 text-slate-200">@{user.username || 'chưa-có-tài-khoản'}</td>
                       <td className="px-4 py-4 text-slate-200">
                         đúng {user.correctPredictions || 0} / sai {user.wrongPredictions || 0}
                       </td>
@@ -342,8 +407,8 @@ function UsersTab({ users, predictionCountByUser, currentUserId, onToggleAdmin, 
                           enabled={Boolean(user.isAdmin)}
                           onClick={() => handleToggleAdmin(user)}
                           disabled={saving || isPrimaryAdmin}
-                          trueLabel="Có quyền admin"
-                          falseLabel="User thường"
+                          trueLabel="Có quyền quản trị"
+                          falseLabel="Người dùng thường"
                         />
                       </td>
                       <td className="px-4 py-4">
@@ -382,20 +447,24 @@ function PredictionsTab({ predictions, matches, users }) {
   const roundOptions = useMemo(() => {
     const map = new Map();
     matches.forEach((match) => {
-      const value = match.group ? `group:${match.group}` : `round:${match.round || match.roundLabel || 'knockout'}`;
-      const label = match.group ? `Bảng ${match.group}` : match.roundLabel || 'Loại trực tiếp';
-      if (!map.has(value)) {
-        map.set(value, { value, label });
+      const option = getMatchRoundFilter(match);
+      if (!map.has(option.value)) {
+        map.set(option.value, option);
       }
     });
-    return Array.from(map.values()).sort((left, right) => left.label.localeCompare(right.label));
+
+    return Array.from(map.values()).sort((left, right) => {
+      const orderDiff = getRoundFilterOrder(left.label) - getRoundFilterOrder(right.label);
+      if (orderDiff !== 0) return orderDiff;
+      return left.label.localeCompare(right.label);
+    });
   }, [matches]);
 
   const matchOptions = useMemo(() => {
     return matches
       .map((match) => ({
         value: match.id,
-        label: `${match.homeTeam || 'TBD'} vs ${match.awayTeam || 'TBD'}`
+        label: `${match.homeTeam || 'Chờ đội'} đấu với ${match.awayTeam || 'Chờ đội'}`
       }))
       .sort((left, right) => left.label.localeCompare(right.label));
   }, [matches]);
@@ -432,9 +501,7 @@ function PredictionsTab({ predictions, matches, users }) {
     const keyword = query.trim().toLowerCase();
     return predictionRows.filter((row) => {
       if (roundFilter) {
-        const currentRound = row.match?.group
-          ? `group:${row.match.group}`
-          : `round:${row.match?.round || row.match?.roundLabel || 'knockout'}`;
+        const currentRound = getMatchRoundFilter(row.match).value;
         if (currentRound !== roundFilter) return false;
       }
 
@@ -498,26 +565,26 @@ function PredictionsTab({ predictions, matches, users }) {
   return (
     <div className="space-y-5">
       <div className="grid gap-4 md:grid-cols-3">
-        <StatCard label="Tổng kèo đã chọn" value={predictions.length} helper="Tất cả predictions hiện có" />
-        <StatCard label="Người chơi tham gia" value={uniqueUsers} helper="Đếm theo userId có prediction" />
-        <StatCard label="Trận có dự đoán" value={groupedPredictions.length} helper="Nhóm theo matchId" />
+        <StatCard label="Tổng kèo đã chọn" value={predictions.length} helper="Tất cả dự đoán hiện có" />
+        <StatCard label="Người chơi tham gia" value={uniqueUsers} helper="Đếm theo mã người dùng có dự đoán" />
+        <StatCard label="Trận có dự đoán" value={groupedPredictions.length} helper="Nhóm theo mã trận đấu" />
       </div>
 
       <div className="grid gap-3 lg:grid-cols-[1.2fr_1fr_1fr_1fr]">
-        <SearchInput value={query} onChange={setQuery} placeholder="Tìm theo user, trận đấu, bảng hoặc lựa chọn" />
-        <FilterSelect value={roundFilter} onChange={setRoundFilter} options={roundOptions} placeholder="Tất cả vòng / bảng" />
+        <SearchInput value={query} onChange={setQuery} placeholder="Tìm theo người dùng, trận đấu, bảng hoặc lựa chọn" />
+        <FilterSelect value={roundFilter} onChange={setRoundFilter} options={roundOptions} placeholder="Tất cả vòng đấu" />
         <FilterSelect value={matchFilter} onChange={setMatchFilter} options={matchOptions} placeholder="Tất cả trận" />
-        <FilterSelect value={userFilter} onChange={setUserFilter} options={userOptions} placeholder="Tất cả user" />
+        <FilterSelect value={userFilter} onChange={setUserFilter} options={userOptions} placeholder="Tất cả người dùng" />
       </div>
 
       {groupedPredictions.length === 0 ? (
-        <EmptyState title="Chưa có kèo dự đoán" description="User chưa chọn kèo nào hoặc không có kết quả khớp từ khóa tìm kiếm." />
+        <EmptyState title="Chưa có kèo dự đoán" description="Người dùng chưa chọn kèo nào hoặc không có kết quả khớp từ khóa tìm kiếm." />
       ) : (
         <div className="space-y-4">
           {groupedPredictions.map((group) => {
             const match = group.match;
             const matchTitle =
-              match?.homeTeam && match?.awayTeam ? `${match.homeTeam} vs ${match.awayTeam}` : `Match ${group.key}`;
+              match?.homeTeam && match?.awayTeam ? `${match.homeTeam} đấu với ${match.awayTeam}` : `Trận ${group.key}`;
 
             return (
               <section
@@ -577,7 +644,7 @@ function PredictionsTab({ predictions, matches, users }) {
                             className="grid grid-cols-[minmax(220px,1.2fr)_minmax(180px,1fr)_140px_170px] items-center gap-3 px-5 py-3 transition hover:bg-white/[0.03]"
                           >
                             <div className="min-w-0">
-                              <p className="truncate font-semibold text-white">{user?.displayName || 'User không xác định'}</p>
+                              <p className="truncate font-semibold text-white">{user?.displayName || 'Người dùng không xác định'}</p>
                               <p className="mt-1 truncate text-sm text-slate-400">@{user?.username || row.userId}</p>
                             </div>
 
@@ -616,10 +683,11 @@ function PredictionsTab({ predictions, matches, users }) {
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState('matches');
+  const [matchRoundFilter, setMatchRoundFilter] = useState('');
   const [matches, setMatches] = useState(fallbackMatches);
   const [users, setUsers] = useState([]);
   const [predictions, setPredictions] = useState([]);
-  const { applyMatchOverrides, resetAllOverrides } = useDevelopMode();
+  const { applyMatchOverrides } = useDevelopMode();
   const { user: currentUser } = useAuth();
 
   useEffect(() => {
@@ -634,7 +702,7 @@ export default function AdminPage() {
   useEffect(() => listenAllPredictions(setPredictions), []);
 
   const displayMatches = useMemo(() => applyMatchOverrides(matches), [applyMatchOverrides, matches]);
-  const sections = useMemo(() => groupMatchesByDay(displayMatches), [displayMatches]);
+  const matchRoundOptions = useMemo(() => getMatchRoundOptions(displayMatches), [displayMatches]);
 
   const sortedUsers = useMemo(() => {
     return [...users].sort((left, right) => {
@@ -664,62 +732,44 @@ export default function AdminPage() {
     });
   };
 
-  const headerSubtitle =
-    activeTab === 'matches'
-      ? 'Chỉnh thông tin trận đấu tại đây. Mọi thay đổi đang áp dụng cục bộ lên giao diện hiện tại.'
-      : activeTab === 'users'
-        ? 'Quản lý tài khoản theo dạng bảng. Có thể khóa tài khoản hoặc bật quyền admin trực tiếp.'
-        : 'Kiểm tra các lựa chọn thắng - hòa - thua mà user đã lưu theo từng trận đấu.';
-
   return (
     <div>
-      <SectionHeader
-        title="Quản trị"
-        subtitle={headerSubtitle}
-        action={
-          activeTab === 'matches' ? (
-            <button
-              type="button"
-              onClick={resetAllOverrides}
-              className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
-            >
-              Reset tất cả
-            </button>
-          ) : null
-        }
-      />
-
-      <div className="mb-6 flex flex-wrap gap-2">
-        {adminTabs.map((tab) => (
+      <div className="mb-6 grid gap-2 lg:grid-cols-3">
+        <div className="flex flex-wrap gap-2">
           <AdminTabButton
-            key={tab.id}
-            active={activeTab === tab.id}
-            icon={tab.icon}
-            label={tab.label}
-            onClick={() => setActiveTab(tab.id)}
+            active={activeTab === 'matches'}
+            icon={Shield}
+            label="Trận đấu"
+            onClick={() => setActiveTab('matches')}
           />
-        ))}
+          {activeTab === 'matches' ? (
+            <div className="min-w-[220px] flex-1">
+              <FilterSelect
+                value={matchRoundFilter}
+                onChange={setMatchRoundFilter}
+                options={matchRoundOptions}
+                placeholder="Tất cả vòng đấu"
+              />
+            </div>
+          ) : null}
+        </div>
+
+        {adminTabs
+          .filter((tab) => tab.id !== 'matches')
+          .map((tab) => (
+            <AdminTabButton
+              key={tab.id}
+              active={activeTab === tab.id}
+              icon={tab.icon}
+              label={tab.label}
+              className="w-full justify-center"
+              onClick={() => setActiveTab(tab.id)}
+            />
+          ))}
       </div>
 
       {activeTab === 'matches' ? (
-        <div className="space-y-5">
-          {sections.map((section) => (
-            <section
-              key={section.key}
-              className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-slate-950/70 shadow-glow ring-1 ring-white/5"
-            >
-              <div className="border-b border-white/10 bg-white/5 px-5 py-4">
-                <h2 className="font-display text-xl font-black text-white">{section.label}</h2>
-              </div>
-
-              <div className="grid items-start gap-4 p-4 md:grid-cols-2">
-                {section.matches.map((match) => (
-                  <AdminMatchCard key={match.id} match={match} />
-                ))}
-              </div>
-            </section>
-          ))}
-        </div>
+        <MatchesTab matches={displayMatches} roundFilter={matchRoundFilter} />
       ) : null}
 
       {activeTab === 'users' ? (

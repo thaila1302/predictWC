@@ -67,18 +67,18 @@ export default function AuthPage() {
         <section className="rounded-[2rem] border border-white/10 bg-slate-950/75 p-8 shadow-glow ring-1 ring-white/5">
           <div className="mb-6 inline-flex items-center gap-3 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-sm font-semibold text-cyan-200">
             <LockKeyhole size={16} />
-            PredictWC Access
+            Truy cập PredictWC
           </div>
           <h1 className="font-display text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
-            Đăng nhập để dự đoán World Cup.
+            Đăng nhập để dự đoán Cúp Thế giới.
           </h1>
           <p className="mt-4 max-w-xl text-base text-slate-300">
             Tạo tài khoản đơn giản bằng họ và tên, tài khoản, mật khẩu. Sau khi đăng nhập, bạn có thể dự đoán và theo dõi bảng xếp hạng.
           </p>
           <div className="mt-8 grid gap-4 sm:grid-cols-3">
             {[
-              ['Dự đoán nhanh', 'Chọn kết quả từng trận ngay trên card'],
-              ['Realtime', 'Điểm và bảng xếp hạng cập nhật trực tiếp'],
+              ['Dự đoán nhanh', 'Chọn kết quả từng trận ngay trên thẻ'],
+              ['Thời gian thực', 'Điểm và bảng xếp hạng cập nhật trực tiếp'],
               ['Quản trị', 'Tinh chỉnh thông tin trận đấu tại trang quản trị']
             ].map(([title, description]) => (
               <div key={title} className="rounded-2xl border border-white/10 bg-white/5 p-4">

@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Clock3, Lock } from 'lucide-react';
-import SectionHeader from './SectionHeader';
 import StatusBadge from './StatusBadge';
 import PredictionButtons from './PredictionButtons';
 import PredictionConfirmDialog from './PredictionConfirmDialog';
@@ -117,7 +116,7 @@ function MatchCard({ match, prediction, onPredict, saving, roundLabel, teamNameO
   const { matchOverrides } = useDevelopMode();
   const started = isMatchStarted(match.matchTime);
   const locked = isPredictionLocked(match.matchTime);
-  const lockLabel = started ? 'Da khoa' : 'Khoa truoc 30 phut';
+  const lockLabel = started ? 'Đã khóa' : 'Khóa trước 30 phút';
   const override = matchOverrides[match.id] || {};
   const homeTeamName = Object.prototype.hasOwnProperty.call(override, 'homeTeam')
     ? match.homeTeam
@@ -179,8 +178,6 @@ function MatchCard({ match, prediction, onPredict, saving, roundLabel, teamNameO
 export default function KnockoutRoundPage({
   roundKey,
   roundLabel,
-  title,
-  subtitle,
   emptyTitle,
   emptyHint,
   seedData,
@@ -251,8 +248,6 @@ export default function KnockoutRoundPage({
 
   return (
     <div>
-      <SectionHeader title={title} subtitle={subtitle} />
-
       {matches.length === 0 ? (
         <div className="glass rounded-[1.75rem] p-8 text-center shadow-glow">
           <p className="font-display text-2xl font-bold text-white">{emptyTitle}</p>

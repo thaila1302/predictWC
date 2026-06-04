@@ -69,8 +69,8 @@ export default function GroupStagePage() {
   return (
     <div>
       <SectionHeader
-        title="Vòng Bảng"
-        subtitle="12 bảng A đến L, mỗi bảng 4 đội. Dữ liệu được dựng từ file JSON và có thể import vào Firestore."
+        title="Vòng bảng"
+        subtitle="12 bảng A đến L, mỗi bảng 4 đội. Dữ liệu được dựng từ file JSON và có thể nhập vào Firestore."
       />
 
       <div className="mb-6 flex flex-wrap gap-3">

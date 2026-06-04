@@ -1,44 +1,44 @@
 # PredictWC
 
-World Cup prediction app built with React, Vite, Tailwind CSS, and Firestore.
+Ứng dụng dự đoán Cúp Thế giới được xây dựng bằng React, Vite, Tailwind CSS và Firestore.
 
-## Features
+## Tính năng
 
-- Guest mode with no login
-- Manual admin management for matches
-- JSON import for match fixtures
-- Realtime leaderboard
-- Prediction scoring with automatic point updates
+- Chế độ khách không cần đăng nhập
+- Quản trị viên quản lý trận đấu thủ công
+- Nhập lịch thi đấu từ JSON
+- Bảng xếp hạng theo thời gian thực
+- Chấm điểm dự đoán và tự động cập nhật điểm
 
-## Local Setup
+## Cài đặt cục bộ
 
-1. Install dependencies:
+1. Cài đặt thư viện:
 
 ```bash
 npm install
 ```
 
-2. Create `.env` from `.env.example` and fill in Firebase values.
+2. Tạo `.env` từ `.env.example` và điền đầy đủ giá trị Firebase.
 
-3. Run the app:
+3. Chạy ứng dụng:
 
 ```bash
 npm run dev
 ```
 
-4. Build for production:
+4. Đóng gói bản production:
 
 ```bash
 npm run build
 ```
 
-## Firestore Collections
+## Bộ sưu tập Firestore
 
 - `users`
 - `matches`
 - `predictions`
 
-## Match Format
+## Định dạng trận đấu
 
 ```json
 {
@@ -55,11 +55,11 @@ npm run build
 }
 ```
 
-## Admin Flow
+## Luồng quản trị
 
-- Add a match manually
-- Edit a match
-- Delete a match
-- Import `matches.json`
-- Set score and mark the match as `finished`
-- The app recalculates prediction points and leaderboard totals automatically
+- Thêm trận đấu thủ công
+- Sửa trận đấu
+- Xóa trận đấu
+- Nhập `matches.json`
+- Đặt tỷ số và đánh dấu trận đấu là `finished`
+- Ứng dụng tự động tính lại điểm dự đoán và tổng điểm bảng xếp hạng

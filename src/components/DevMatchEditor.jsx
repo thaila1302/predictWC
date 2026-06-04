@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronDown, RotateCcw, Save, Search } from 'lucide-react';
 import { getResultFromScores, parseVietnamDateTimeLocal, toVietnamDateTimeLocal } from '../lib/utils';
 import { useDevelopMode } from '../context/DevelopModeContext';
@@ -27,10 +27,24 @@ function createDraftFromMatch(match) {
 function SearchableTeamSelect({ label, value, code, onSelect }) {
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
+  const containerRef = useRef(null);
 
   useEffect(() => {
     setQuery('');
   }, [value]);
+
+  useEffect(() => {
+    if (!open) return undefined;
+
+    const handlePointerDown = (event) => {
+      if (!containerRef.current?.contains(event.target)) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handlePointerDown);
+    return () => document.removeEventListener('mousedown', handlePointerDown);
+  }, [open]);
 
   const normalizedQuery = query.trim().toLowerCase();
 
@@ -40,7 +54,7 @@ function SearchableTeamSelect({ label, value, code, onSelect }) {
     }
 
     return teamOptions.filter((team) => {
-      const haystacks = [team.name, team.code, `Bang ${team.group}`];
+      const haystacks = [team.name, team.code, `Bảng ${team.group}`];
       return haystacks.some((item) => String(item).toLowerCase().includes(normalizedQuery));
     });
   }, [normalizedQuery]);
@@ -54,23 +68,30 @@ function SearchableTeamSelect({ label, value, code, onSelect }) {
   return (
     <label className="space-y-1">
       <span className="text-xs font-medium text-slate-300">{label}</span>
-      <div className="relative">
+      <div className="relative" ref={containerRef}>
         <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-slate-950/70 px-3 py-2 text-sm text-white focus-within:border-cyan-400/50">
           <Search size={14} className="shrink-0 text-slate-400" />
           <input
             value={query}
-            onFocus={() => setOpen(true)}
+            onClick={() => setOpen((current) => !current)}
             onChange={(event) => {
               setQuery(event.target.value);
               setOpen(true);
             }}
-            placeholder={value || 'Tim quoc gia...'}
+            placeholder={value || 'Tìm quốc gia...'}
             className="w-full bg-transparent text-sm text-white outline-none placeholder:text-slate-500"
           />
           <span className="rounded-lg bg-white/5 px-2 py-1 text-[11px] font-bold text-slate-300">
             {code || '--'}
           </span>
-          <ChevronDown size={14} className="shrink-0 text-slate-400" />
+          <button
+            type="button"
+            aria-label={open ? 'Đóng danh sách đội' : 'Mở danh sách đội'}
+            onClick={() => setOpen((current) => !current)}
+            className="shrink-0 rounded-lg p-1 text-slate-400 transition hover:bg-white/10 hover:text-white"
+          >
+            <ChevronDown size={14} className={`transition ${open ? 'rotate-180' : ''}`} />
+          </button>
         </div>
 
         {open ? (
@@ -85,7 +106,7 @@ function SearchableTeamSelect({ label, value, code, onSelect }) {
                 >
                   <div>
                     <p className="text-sm font-semibold text-white">{team.name}</p>
-                    <p className="text-[11px] uppercase tracking-[0.24em] text-slate-400">Bang {team.group}</p>
+                    <p className="text-[11px] uppercase tracking-[0.24em] text-slate-400">Bảng {team.group}</p>
                   </div>
                   <span className="rounded-lg bg-white/5 px-2 py-1 text-[11px] font-bold text-slate-300">
                     {team.code}
@@ -93,7 +114,7 @@ function SearchableTeamSelect({ label, value, code, onSelect }) {
                 </button>
               ))
             ) : (
-              <div className="px-3 py-4 text-sm text-slate-400">Khong tim thay doi phu hop.</div>
+              <div className="px-3 py-4 text-sm text-slate-400">Không tìm thấy đội phù hợp.</div>
             )}
           </div>
         ) : null}
@@ -153,7 +174,7 @@ export default function DevMatchEditor({ match }) {
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-xs font-black uppercase tracking-[0.24em] text-cyan-200">Quản trị trận đấu</p>
-          <p className="text-xs text-slate-400">Chỉnh bản nháp và bấm Save để áp dụng.</p>
+          <p className="text-xs text-slate-400">Chỉnh bản nháp và bấm Lưu để áp dụng.</p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -163,7 +184,7 @@ export default function DevMatchEditor({ match }) {
             className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-slate-200 hover:bg-white/10"
           >
             <RotateCcw size={13} />
-            Reset
+            Đặt lại
           </button>
           <button
             type="button"
@@ -172,7 +193,7 @@ export default function DevMatchEditor({ match }) {
             className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-400 to-violet-500 px-3 py-2 text-xs font-bold text-slate-950 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Save size={13} />
-            {saving ? 'Saving...' : 'Save'}
+            {saving ? 'Đang lưu...' : 'Lưu'}
           </button>
         </div>
       </div>
@@ -239,9 +260,9 @@ export default function DevMatchEditor({ match }) {
             onChange={(event) => setDraft((current) => ({ ...current, status: event.target.value }))}
             className="w-full rounded-xl border border-white/10 bg-slate-950/70 px-3 py-2 text-sm text-white outline-none transition focus:border-cyan-400/50"
           >
-            <option value="upcoming">upcoming</option>
-            <option value="live">live</option>
-            <option value="finished">finished</option>
+            <option value="upcoming">Sắp diễn ra</option>
+            <option value="live">Đang diễn ra</option>
+            <option value="finished">Đã kết thúc</option>
           </select>
         </label>
 

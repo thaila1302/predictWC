@@ -6,12 +6,10 @@ export default function QuarterFinalsPage() {
     <KnockoutRoundPage
       roundKey="quarter_finals"
       roundLabel="Tứ kết"
-      title="Tứ kết"
-      subtitle="Cac tran duoc nhom theo ngay va sap theo moc thoi gian gan nhat."
-      emptyTitle="Chua co tran tu ket nao"
-      emptyHint="Hay import `data/quarter-finals.json` hoac du lieu Firestore tuong ung."
+      emptyTitle="Chưa có trận tứ kết nào"
+      emptyHint="Hãy nhập `data/quarter-finals.json` hoặc dữ liệu Firestore tương ứng."
       seedData={quarterFinalsSeed}
-      teamNameOverride="TBD"
+      teamNameOverride="Chờ đội"
     />
   );
 }

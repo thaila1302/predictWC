@@ -38,11 +38,11 @@ const roundStyles = {
 
 const roundLabels = {
   round_of_32: '1/16',
-  round_of_16: 'Round of 16',
-  quarter_final: 'Quarter Finals',
-  semi_final: 'Semi Finals',
+  round_of_16: 'Vòng 1/8',
+  quarter_final: 'Tứ kết',
+  semi_final: 'Bán kết',
   final: 'Final',
-  third_place: 'Third Place'
+  third_place: 'Hạng ba'
 };
 
 const cardSlots = [
@@ -55,26 +55,26 @@ const cardSlots = [
   { id: 'm81', key: 'round_of_32-7', round: 'round_of_32', col: 1, row: 25, meta: 'M81', date: '1-Jul', home: 'D1', away: 'BEFIJ3' },
   { id: 'm82', key: 'round_of_32-8', round: 'round_of_32', col: 1, row: 29, meta: 'M82', date: '1-Jul', home: 'G1', away: 'AEHIJ3' },
 
-  { id: 'm89', key: 'round_of_16-1', round: 'round_of_16', col: 3, row: 3, meta: 'M89', date: '4-Jul', home: 'Winner M74', away: 'Winner M77' },
-  { id: 'm90', key: 'round_of_16-2', round: 'round_of_16', col: 3, row: 11, meta: 'M90', date: '4-Jul', home: 'Winner M73', away: 'Winner M75' },
-  { id: 'm93', key: 'round_of_16-3', round: 'round_of_16', col: 3, row: 19, meta: 'M93', date: '6-Jul', home: 'Winner M83', away: 'Winner M84' },
-  { id: 'm94', key: 'round_of_16-4', round: 'round_of_16', col: 3, row: 27, meta: 'M94', date: '6-Jul', home: 'Winner M81', away: 'Winner M82' },
+  { id: 'm89', key: 'round_of_16-1', round: 'round_of_16', col: 3, row: 3, meta: 'M89', date: '4-Jul', home: 'Thắng M74', away: 'Thắng M77' },
+  { id: 'm90', key: 'round_of_16-2', round: 'round_of_16', col: 3, row: 11, meta: 'M90', date: '4-Jul', home: 'Thắng M73', away: 'Thắng M75' },
+  { id: 'm93', key: 'round_of_16-3', round: 'round_of_16', col: 3, row: 19, meta: 'M93', date: '6-Jul', home: 'Thắng M83', away: 'Thắng M84' },
+  { id: 'm94', key: 'round_of_16-4', round: 'round_of_16', col: 3, row: 27, meta: 'M94', date: '6-Jul', home: 'Thắng M81', away: 'Thắng M82' },
 
-  { id: 'm97', key: 'quarter_final-25', round: 'quarter_final', col: 5, row: 7, meta: 'M97', date: '9-Jul', home: 'Winner M89', away: 'Winner M90' },
-  { id: 'm98', key: 'quarter_final-26', round: 'quarter_final', col: 5, row: 23, meta: 'M98', date: '10-Jul', home: 'Winner M93', away: 'Winner M94' },
-  { id: 'm101', key: 'semi_final-29', round: 'semi_final', col: 7, row: 15, meta: 'M101', date: '14-Jul', home: 'Winner M97', away: 'Winner M98' },
+  { id: 'm97', key: 'quarter_final-25', round: 'quarter_final', col: 5, row: 7, meta: 'M97', date: '9-Jul', home: 'Thắng M89', away: 'Thắng M90' },
+  { id: 'm98', key: 'quarter_final-26', round: 'quarter_final', col: 5, row: 23, meta: 'M98', date: '10-Jul', home: 'Thắng M93', away: 'Thắng M94' },
+  { id: 'm101', key: 'semi_final-29', round: 'semi_final', col: 7, row: 15, meta: 'M101', date: '14-Jul', home: 'Thắng M97', away: 'Thắng M98' },
 
-  { id: 'final', key: 'final-31', round: 'final', col: 9, row: 13, meta: 'FINAL', date: '19-Jul', home: 'Winner M101', away: 'Winner M102', featured: true },
-  { id: 'bronze', key: 'third_place-32', round: 'third_place', col: 9, row: 19, meta: 'THIRD PLACE', date: '18-Jul', home: 'Loser M101', away: 'Loser M102', featured: true },
+  { id: 'final', key: 'final-31', round: 'final', col: 9, row: 13, meta: 'CHUNG KẾT', date: '19-Jul', home: 'Thắng M101', away: 'Thắng M102', featured: true },
+  { id: 'bronze', key: 'third_place-32', round: 'third_place', col: 9, row: 19, meta: 'TRANH HẠNG BA', date: '18-Jul', home: 'Thua M101', away: 'Thua M102', featured: true },
 
-  { id: 'm102', key: 'semi_final-30', round: 'semi_final', col: 11, row: 15, meta: 'M102', date: '15-Jul', home: 'Winner M99', away: 'Winner M100' },
-  { id: 'm99', key: 'quarter_final-27', round: 'quarter_final', col: 13, row: 7, meta: 'M99', date: '11-Jul', home: 'Winner M91', away: 'Winner M92' },
-  { id: 'm100', key: 'quarter_final-28', round: 'quarter_final', col: 13, row: 23, meta: 'M100', date: '11-Jul', home: 'Winner M95', away: 'Winner M96' },
+  { id: 'm102', key: 'semi_final-30', round: 'semi_final', col: 11, row: 15, meta: 'M102', date: '15-Jul', home: 'Thắng M99', away: 'Thắng M100' },
+  { id: 'm99', key: 'quarter_final-27', round: 'quarter_final', col: 13, row: 7, meta: 'M99', date: '11-Jul', home: 'Thắng M91', away: 'Thắng M92' },
+  { id: 'm100', key: 'quarter_final-28', round: 'quarter_final', col: 13, row: 23, meta: 'M100', date: '11-Jul', home: 'Thắng M95', away: 'Thắng M96' },
 
-  { id: 'm91', key: 'round_of_16-5', round: 'round_of_16', col: 15, row: 3, meta: 'M91', date: '5-Jul', home: 'Winner M76', away: 'Winner M78' },
-  { id: 'm92', key: 'round_of_16-6', round: 'round_of_16', col: 15, row: 11, meta: 'M92', date: '5-Jul', home: 'Winner M79', away: 'Winner M80' },
-  { id: 'm95', key: 'round_of_16-7', round: 'round_of_16', col: 15, row: 19, meta: 'M95', date: '7-Jul', home: 'Winner M86', away: 'Winner M88' },
-  { id: 'm96', key: 'round_of_16-8', round: 'round_of_16', col: 15, row: 27, meta: 'M96', date: '7-Jul', home: 'Winner M85', away: 'Winner M87' },
+  { id: 'm91', key: 'round_of_16-5', round: 'round_of_16', col: 15, row: 3, meta: 'M91', date: '5-Jul', home: 'Thắng M76', away: 'Thắng M78' },
+  { id: 'm92', key: 'round_of_16-6', round: 'round_of_16', col: 15, row: 11, meta: 'M92', date: '5-Jul', home: 'Thắng M79', away: 'Thắng M80' },
+  { id: 'm95', key: 'round_of_16-7', round: 'round_of_16', col: 15, row: 19, meta: 'M95', date: '7-Jul', home: 'Thắng M86', away: 'Thắng M88' },
+  { id: 'm96', key: 'round_of_16-8', round: 'round_of_16', col: 15, row: 27, meta: 'M96', date: '7-Jul', home: 'Thắng M85', away: 'Thắng M87' },
 
   { id: 'm76', key: 'round_of_32-9', round: 'round_of_32', col: 17, row: 1, meta: 'M76', date: '29-Jun', home: 'C1', away: 'F2' },
   { id: 'm78', key: 'round_of_32-10', round: 'round_of_32', col: 17, row: 5, meta: 'M78', date: '30-Jun', home: 'E2', away: 'I2' },
@@ -222,9 +222,9 @@ function seedChipClass(seedLabel) {
 function TeamRow({ label }) {
   return (
     <div className="flex min-h-0 items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/5 px-3 py-2">
-      <span className="min-w-0 truncate text-sm font-bold text-white">{label || 'Cho doi'}</span>
-      <span className={`shrink-0 rounded-full px-2 py-1 text-[10px] font-black uppercase ring-1 ${seedChipClass(label || 'TBD')}`}>
-        {String(label || 'TBD').slice(0, 3)}
+      <span className="min-w-0 truncate text-sm font-bold text-white">{label || 'Chờ đội'}</span>
+      <span className={`shrink-0 rounded-full px-2 py-1 text-[10px] font-black uppercase ring-1 ${seedChipClass(label || 'Chờ đội')}`}>
+        {String(label || 'Chờ đội').slice(0, 3)}
       </span>
     </div>
   );
@@ -251,7 +251,7 @@ function CompactMatchCard({ slot }) {
             <ScorePill homeScore={slot.homeScore} awayScore={slot.awayScore} />
           </div>
         ) : (
-          <span className="shrink-0 text-slate-300">Chua co ket qua</span>
+          <span className="shrink-0 text-slate-300">Chưa có kết quả</span>
         )}
       </div>
     </article>
@@ -284,7 +284,7 @@ function MatchCard({ slot }) {
               <ScorePill homeScore={slot.homeScore} awayScore={slot.awayScore} />
             </div>
           ) : (
-            <span className="shrink-0 text-slate-300">Chua co ket qua</span>
+            <span className="shrink-0 text-slate-300">Chưa có kết quả</span>
           )}
         </div>
       </div>

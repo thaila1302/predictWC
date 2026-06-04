@@ -13,8 +13,8 @@ export default function LeaderboardPage() {
   return (
     <div>
       <SectionHeader
-        title="Bảng Xếp Hạng"
-        subtitle="Bảng xếp hạng realtime theo số lần dự đoán đúng. Nếu bằng nhau thì người có ít dự đoán sai hơn sẽ đứng trên."
+        title="Bảng xếp hạng"
+        subtitle="Bảng xếp hạng theo thời gian thực dựa trên số lần dự đoán đúng. Nếu bằng nhau thì người có ít dự đoán sai hơn sẽ đứng trên."
       />
 
       <div className="mb-6 grid gap-4 lg:grid-cols-3">

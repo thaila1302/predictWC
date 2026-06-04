@@ -2,7 +2,6 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout';
 import MatchesPage from './pages/MatchesPage';
 import LeaderboardPage from './pages/LeaderboardPage';
-import GroupStagePage from './pages/GroupStagePage';
 import KnockoutPage from './pages/KnockoutPage';
 import RoundOf16Page from './pages/RoundOf16Page';
 import QuarterFinalsPage from './pages/QuarterFinalsPage';
@@ -31,7 +30,6 @@ export default function App() {
             }
           >
             <Route index element={<Navigate to="/matches" replace />} />
-            <Route path="group-stage" element={<GroupStagePage />} />
             <Route path="knockout" element={<KnockoutPage />} />
             <Route path="round-of-16" element={<RoundOf16Page />} />
             <Route path="quarter-finals" element={<QuarterFinalsPage />} />

@@ -6,10 +6,8 @@ export default function KnockoutPage() {
     <KnockoutRoundPage
       roundKey="round_of_32"
       roundLabel="1/16"
-      title="1/16"
-      subtitle="Cac tran duoc nhom theo ngay va sap theo moc thoi gian gan nhat."
-      emptyTitle="Chua co tran 1/16 nao"
-      emptyHint="Hay import `data/1-16.json` hoac du lieu Firestore tuong ung."
+      emptyTitle="Chưa có trận 1/16 nào"
+      emptyHint="Hãy nhập `data/1-16.json` hoặc dữ liệu Firestore tương ứng."
       seedData={roundOf32Seed}
     />
   );

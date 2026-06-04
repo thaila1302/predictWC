@@ -1,17 +1,28 @@
 import { Link, NavLink, Outlet } from 'react-router-dom';
-import { Trophy, ListChecks, Medal, User2, Layers3, GitBranch, LogOut, Shield } from 'lucide-react';
+import {
+  Award,
+  Crown,
+  GitBranch,
+  GitFork,
+  ListChecks,
+  LogOut,
+  Medal,
+  Network,
+  Shield,
+  Trophy,
+  User2
+} from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useAuth } from '../context/AuthContext';
 
 const navItems = [
-  { to: '/group-stage', label: 'Vòng Bảng', icon: Layers3 },
-  { to: '/matches', label: 'Trận Đấu', icon: ListChecks },
-  { to: '/knockout', label: '1/16', icon: GitBranch },
-  { to: '/round-of-16', label: '1/8', icon: GitBranch },
+  { to: '/matches', label: 'Vòng Bảng', icon: ListChecks },
+  { to: '/knockout', label: '1/16', icon: Network },
+  { to: '/round-of-16', label: '1/8', icon: GitFork },
   { to: '/quarter-finals', label: 'Tứ kết', icon: GitBranch },
-  { to: '/semi-finals', label: 'Bán kết', icon: GitBranch },
-  { to: '/third-place', label: 'Hạng ba', icon: GitBranch },
-  { to: '/final', label: 'Chung kết', icon: GitBranch },
+  { to: '/semi-finals', label: 'Bán kết', icon: Award },
+  { to: '/third-place', label: 'Hạng ba', icon: Medal },
+  { to: '/final', label: 'Chung kết', icon: Crown },
   { to: '/leaderboard', label: 'Bảng Xếp Hạng', icon: Medal },
   { to: '/admin', label: 'Quản trị', icon: Shield }
 ];
@@ -31,7 +42,7 @@ export default function Layout() {
               </div>
               <div>
                 <p className="font-display text-xl font-extrabold tracking-tight text-white">PredictWC</p>
-                <p className="text-xs uppercase tracking-[0.3em] text-violet-300">Thử thách World Cup</p>
+                <p className="text-xs uppercase tracking-[0.3em] text-violet-300">Worldcup 2026</p>
               </div>
             </Link>
 
@@ -53,7 +64,7 @@ export default function Layout() {
           </div>
 
           <nav className="mt-4 overflow-x-auto">
-            <div className="flex min-w-max gap-2 rounded-3xl border border-white/10 bg-white/5 p-2 shadow-glow">
+            <div className="flex min-w-max justify-between gap-2 rounded-3xl border border-white/10 bg-white/5 p-2 shadow-glow lg:min-w-0 lg:w-full">
               {visibleNavItems.map((item) => {
                 const Icon = item.icon;
 
@@ -63,7 +74,7 @@ export default function Layout() {
                     to={item.to}
                     className={({ isActive }) =>
                       cn(
-                        'inline-flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold whitespace-nowrap transition',
+                        'inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold whitespace-nowrap transition lg:flex-1',
                         isActive
                           ? 'bg-gradient-to-r from-violet-400 to-cyan-400 text-slate-950'
                           : 'text-slate-200 hover:bg-white/10'

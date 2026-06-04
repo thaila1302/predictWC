@@ -6,12 +6,10 @@ export default function RoundOf16Page() {
     <KnockoutRoundPage
       roundKey="round_of_16"
       roundLabel="1/8"
-      title="1/8"
-      subtitle="Cac tran duoc nhom theo ngay va sap theo moc thoi gian gan nhat."
-      emptyTitle="Chua co tran 1/8 nao"
-      emptyHint="Hay import `data/1-8.json` hoac du lieu Firestore tuong ung."
+      emptyTitle="Chưa có trận 1/8 nào"
+      emptyHint="Hãy nhập `data/1-8.json` hoặc dữ liệu Firestore tương ứng."
       seedData={roundOf16Seed}
-      teamNameOverride="TBD"
+      teamNameOverride="Chờ đội"
     />
   );
 }

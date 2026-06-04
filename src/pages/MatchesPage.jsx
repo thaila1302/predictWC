@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Clock3, Lock } from 'lucide-react';
-import SectionHeader from '../components/SectionHeader';
 import StatusBadge from '../components/StatusBadge';
 import PredictionButtons from '../components/PredictionButtons';
 import PredictionConfirmDialog from '../components/PredictionConfirmDialog';
@@ -77,7 +76,7 @@ function MatchSeparatorIcon({ homeScore, awayScore }) {
 function MatchCard({ match, prediction, onPredict, saving }) {
   const started = isMatchStarted(match.matchTime);
   const locked = isPredictionLocked(match.matchTime);
-  const lockLabel = started ? 'Da khoa' : 'Khoa truoc 30 phut';
+  const lockLabel = started ? 'Đã khóa' : 'Khóa trước 30 phút';
 
   return (
     <article className="self-start overflow-hidden rounded-[1.25rem] border border-white/10 bg-slate-950/70 shadow-glow ring-1 ring-white/5 transition hover:border-white/20">
@@ -86,7 +85,7 @@ function MatchCard({ match, prediction, onPredict, saving }) {
           <div className="flex items-center gap-2">
             <StatusBadge status={match.status || 'upcoming'} />
             <span className="text-[11px] uppercase tracking-[0.24em] text-slate-400">
-              {match.group ? `Bang ${match.group}` : 'Loai truc tiep'}
+              {match.group ? `Bảng ${match.group}` : 'Loại trực tiếp'}
             </span>
           </div>
 
@@ -192,15 +191,10 @@ export default function MatchesPage() {
 
   return (
     <div>
-      <SectionHeader
-        title="Tran Dau"
-        subtitle="Tran dau duoc nhom theo ngay. Cac lua chon du doan luon hien thi tren tung tran."
-      />
-
       {matches.length === 0 ? (
         <div className="glass rounded-[1.75rem] p-8 text-center shadow-glow">
-          <p className="font-display text-2xl font-bold text-white">Chua co tran dau nao</p>
-          <p className="mt-3 text-slate-300">Hay yeu cau quan tri vien import `data/matches.json` truoc.</p>
+          <p className="font-display text-2xl font-bold text-white">Chưa có trận đấu nào</p>
+          <p className="mt-3 text-slate-300">Hãy yêu cầu quản trị viên nhập `data/matches.json` trước.</p>
         </div>
       ) : null}
 
@@ -211,7 +205,7 @@ export default function MatchesPage() {
             className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-slate-950/70 shadow-glow ring-1 ring-white/5"
           >
             <div className="border-b border-white/10 bg-white/5 px-5 py-4">
-              <h2 className="font-display text-xl font-black text-white">Vong Bang - {section.label}</h2>
+              <h2 className="font-display text-xl font-black text-white">Vòng bảng - {section.label}</h2>
             </div>
 
             <div className="grid items-start gap-4 p-4 md:grid-cols-2">
