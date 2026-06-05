@@ -72,6 +72,7 @@ export function AuthProvider({ children }) {
         uid: nextAccount.uid,
         displayName: nextAccount.displayName,
         username: nextAccount.username,
+        email: nextAccount.email || '',
         isAdmin: Boolean(nextAccount.isAdmin),
         isLocked: Boolean(nextAccount.isLocked)
       });

@@ -12,6 +12,20 @@ const accentBars = [
   'from-violet-400 to-indigo-500'
 ];
 
+const seedTeamFlags = new Map(
+  seedGroups.flatMap((group) => (group.teams || []).map((team) => [team.code, team.flagUrl]))
+);
+
+function withGroupFlags(groups) {
+  return (groups || []).map((group) => ({
+    ...group,
+    teams: (group.teams || []).map((team) => ({
+      ...team,
+      flagUrl: team.flagUrl || seedTeamFlags.get(team.code) || ''
+    }))
+  }));
+}
+
 function GroupCard({ group, index }) {
   const accent = accentBars[index % accentBars.length];
 
@@ -33,8 +47,12 @@ function GroupCard({ group, index }) {
             key={`${group.label}-${team.code || team.name}`}
             className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-3 py-3 transition hover:border-cyan-400/40 hover:bg-white/10"
           >
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-slate-900/80 text-sm font-black text-white ring-1 ring-white/10">
-              {team.code || String(teamIndex + 1).padStart(2, '0')}
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-slate-900/80 text-sm font-black text-white ring-1 ring-white/10">
+              {team.flagUrl ? (
+                <img src={team.flagUrl} alt={team.name} className="h-full w-full object-cover" />
+              ) : (
+                team.code || String(teamIndex + 1).padStart(2, '0')
+              )}
             </div>
             <div className="min-w-0">
               <p className="truncate text-sm font-bold text-white">{team.name}</p>
@@ -53,7 +71,7 @@ export default function GroupStagePage() {
   useEffect(() => {
     return listenGroups((remoteGroups) => {
       if (remoteGroups.length > 0) {
-        setGroups(remoteGroups);
+        setGroups(withGroupFlags(remoteGroups));
       }
     });
   }, []);

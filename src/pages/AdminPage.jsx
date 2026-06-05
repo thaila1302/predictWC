@@ -322,7 +322,7 @@ function UsersTab({ users, predictionCountByUser, currentUserId, onToggleAdmin, 
     if (!keyword) return users;
 
     return users.filter((user) => {
-      const haystack = [user.displayName, user.username, user.uid || user.id].filter(Boolean).join(' ').toLowerCase();
+      const haystack = [user.displayName, user.email, user.username, user.uid || user.id].filter(Boolean).join(' ').toLowerCase();
       return haystack.includes(keyword);
     });
   }, [query, users]);
@@ -363,7 +363,7 @@ function UsersTab({ users, predictionCountByUser, currentUserId, onToggleAdmin, 
         />
       </div>
 
-      <SearchInput value={query} onChange={setQuery} placeholder="Tìm theo họ tên, tài khoản hoặc UID" />
+      <SearchInput value={query} onChange={setQuery} placeholder="Tìm theo họ tên, email, tài khoản hoặc UID" />
 
       {filteredUsers.length === 0 ? (
         <EmptyState title="Chưa có người dùng phù hợp" description="Thử lại với từ khóa khác hoặc tạo thêm tài khoản để kiểm tra." />
@@ -374,6 +374,7 @@ function UsersTab({ users, predictionCountByUser, currentUserId, onToggleAdmin, 
               <thead className="bg-white/5">
                 <tr className="text-left text-xs uppercase tracking-[0.24em] text-slate-400">
                   <th className="px-4 py-4 font-semibold">Người dùng</th>
+                  <th className="px-4 py-4 font-semibold">Email</th>
                   <th className="px-4 py-4 font-semibold">Tài khoản</th>
                   <th className="px-4 py-4 font-semibold">Đúng / Sai</th>
                   <th className="px-4 py-4 font-semibold">Kèo</th>
@@ -397,6 +398,7 @@ function UsersTab({ users, predictionCountByUser, currentUserId, onToggleAdmin, 
                           {isPrimaryAdmin ? 'Quản trị gốc' : user.isAdmin ? 'Đang là quản trị' : 'Người dùng thường'}
                         </div>
                       </td>
+                      <td className="px-4 py-4 text-slate-200">{user.email || 'Chưa có email'}</td>
                       <td className="px-4 py-4 text-slate-200">@{user.username || 'chưa-có-tài-khoản'}</td>
                       <td className="px-4 py-4 text-slate-200">
                         đúng {user.correctPredictions || 0} / sai {user.wrongPredictions || 0}

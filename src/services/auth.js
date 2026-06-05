@@ -29,6 +29,14 @@ function normalizeUsername(username) {
   return String(username || '').trim().toLowerCase();
 }
 
+function normalizeEmail(email) {
+  return String(email || '').trim().toLowerCase();
+}
+
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 function isPrimaryAdminDisplayName(displayName) {
   return String(displayName || '').trim() === PRIMARY_ADMIN_NAME;
 }
@@ -38,6 +46,7 @@ function toSessionUser(account) {
     uid: account.uid,
     displayName: account.displayName,
     username: account.username,
+    email: account.email || '',
     isAdmin: Boolean(account.isAdmin),
     isLocked: Boolean(account.isLocked)
   };
@@ -142,25 +151,34 @@ export async function updateUserAccess(uid, updates) {
   });
 }
 
-export async function registerWithUsername({ displayName, username, password }) {
+export async function registerWithUsername({ displayName, email, username, password }) {
   const trimmedDisplayName = String(displayName || '').trim();
+  const normalizedEmail = normalizeEmail(email);
   const trimmedUsername = String(username || '').trim();
 
   if (!trimmedDisplayName) {
-    throw new Error('Vui lòng nhập họ và tên.');
+    throw new Error('Vui long nhap ho va ten.');
+  }
+
+  if (!normalizedEmail) {
+    throw new Error('Vui long nhap email.');
+  }
+
+  if (!isValidEmail(normalizedEmail)) {
+    throw new Error('Email khong hop le.');
   }
 
   if (!trimmedUsername) {
-    throw new Error('Vui lòng nhập tài khoản.');
+    throw new Error('Vui long nhap tai khoan.');
   }
 
   if (!password) {
-    throw new Error('Vui lòng nhập mật khẩu.');
+    throw new Error('Vui long nhap mat khau.');
   }
 
   const existingAccount = await findAccountByUsername(trimmedUsername);
   if (existingAccount) {
-    throw new Error('Tài khoản đã tồn tại.');
+    throw new Error('Tai khoan da ton tai.');
   }
 
   const uid = createUid();
@@ -168,6 +186,7 @@ export async function registerWithUsername({ displayName, username, password }) 
   const nextAccount = {
     uid,
     displayName: trimmedDisplayName,
+    email: normalizedEmail,
     username: trimmedUsername,
     usernameLower: normalizeUsername(trimmedUsername),
     passwordHash,

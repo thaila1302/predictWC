@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { getFlagUrlByCode } from '../src/lib/teamFlags.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const projectRoot = join(__dirname, '..');
@@ -129,6 +130,14 @@ const groups = [
   }
 ];
 
+const groupsWithFlags = groups.map((group) => ({
+  ...group,
+  teams: group.teams.map((team) => ({
+    ...team,
+    flagUrl: getFlagUrlByCode(team.code)
+  }))
+}));
+
 const knockoutRounds = [
   {
     round: 'round_of_32',
@@ -208,7 +217,7 @@ function normalizeLookup(value) {
 
 function buildTeamIndex() {
   const index = new Map();
-  groups.forEach((group) => {
+  groupsWithFlags.forEach((group) => {
     group.teams.forEach((team) => {
       index.set(normalizeLookup(team.name), { ...team, group: group.label });
     });
@@ -259,8 +268,8 @@ async function buildGroupStageMatches() {
       awayTeam: awayTeam.name,
       homeCode: homeTeam.code,
       awayCode: awayTeam.code,
-      homeLogo: '',
-      awayLogo: '',
+      homeLogo: homeTeam.flagUrl,
+      awayLogo: awayTeam.flagUrl,
       matchTime: parseVietnamDateTime(match.date, match.time).toISOString(),
       status: match.status || 'upcoming',
       homeScore: match.homeScore,
@@ -280,7 +289,7 @@ async function main() {
 
   const groupsPath = join(dataDir, 'groups.json');
 
-  const groupsJson = JSON.stringify(groups, null, 2);
+  const groupsJson = JSON.stringify(groupsWithFlags, null, 2);
   const matchesJson = JSON.stringify(
     {
       groupStage: await buildGroupStageMatches(),

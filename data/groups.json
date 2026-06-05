@@ -4,19 +4,23 @@
     "teams": [
       {
         "name": "Mexico",
-        "code": "MEX"
+        "code": "MEX",
+        "flagUrl": "https://flagcdn.com/mx.svg"
       },
       {
         "name": "Nam Phi",
-        "code": "RSA"
+        "code": "RSA",
+        "flagUrl": "https://flagcdn.com/za.svg"
       },
       {
         "name": "Hàn Quốc",
-        "code": "KOR"
+        "code": "KOR",
+        "flagUrl": "https://flagcdn.com/kr.svg"
       },
       {
         "name": "CH Séc",
-        "code": "CZE"
+        "code": "CZE",
+        "flagUrl": "https://flagcdn.com/cz.svg"
       }
     ]
   },
@@ -25,19 +29,23 @@
     "teams": [
       {
         "name": "Canada",
-        "code": "CAN"
+        "code": "CAN",
+        "flagUrl": "https://flagcdn.com/ca.svg"
       },
       {
         "name": "Bosnia & Herzegovina",
-        "code": "BIH"
+        "code": "BIH",
+        "flagUrl": "https://flagcdn.com/ba.svg"
       },
       {
         "name": "Qatar",
-        "code": "QAT"
+        "code": "QAT",
+        "flagUrl": "https://flagcdn.com/qa.svg"
       },
       {
         "name": "Thụy Sĩ",
-        "code": "SUI"
+        "code": "SUI",
+        "flagUrl": "https://flagcdn.com/ch.svg"
       }
     ]
   },
@@ -46,19 +54,23 @@
     "teams": [
       {
         "name": "Brazil",
-        "code": "BRA"
+        "code": "BRA",
+        "flagUrl": "https://flagcdn.com/br.svg"
       },
       {
         "name": "Morocco",
-        "code": "MAR"
+        "code": "MAR",
+        "flagUrl": "https://flagcdn.com/ma.svg"
       },
       {
         "name": "Haiti",
-        "code": "HAI"
+        "code": "HAI",
+        "flagUrl": "https://flagcdn.com/ht.svg"
       },
       {
         "name": "Scotland",
-        "code": "SCO"
+        "code": "SCO",
+        "flagUrl": "https://flagcdn.com/gb-sct.svg"
       }
     ]
   },
@@ -67,19 +79,23 @@
     "teams": [
       {
         "name": "Mỹ",
-        "code": "USA"
+        "code": "USA",
+        "flagUrl": "https://flagcdn.com/us.svg"
       },
       {
         "name": "Paraguay",
-        "code": "PAR"
+        "code": "PAR",
+        "flagUrl": "https://flagcdn.com/py.svg"
       },
       {
         "name": "Úc",
-        "code": "AUS"
+        "code": "AUS",
+        "flagUrl": "https://flagcdn.com/au.svg"
       },
       {
         "name": "Thổ Nhĩ Kỳ",
-        "code": "TUR"
+        "code": "TUR",
+        "flagUrl": "https://flagcdn.com/tr.svg"
       }
     ]
   },
@@ -88,19 +104,23 @@
     "teams": [
       {
         "name": "Đức",
-        "code": "GER"
+        "code": "GER",
+        "flagUrl": "https://flagcdn.com/de.svg"
       },
       {
         "name": "Curaçao",
-        "code": "CUW"
+        "code": "CUW",
+        "flagUrl": "https://flagcdn.com/cw.svg"
       },
       {
         "name": "Bờ Biển Ngà",
-        "code": "CIV"
+        "code": "CIV",
+        "flagUrl": "https://flagcdn.com/ci.svg"
       },
       {
         "name": "Ecuador",
-        "code": "ECU"
+        "code": "ECU",
+        "flagUrl": "https://flagcdn.com/ec.svg"
       }
     ]
   },
@@ -109,19 +129,23 @@
     "teams": [
       {
         "name": "Hà Lan",
-        "code": "NED"
+        "code": "NED",
+        "flagUrl": "https://flagcdn.com/nl.svg"
       },
       {
         "name": "Nhật Bản",
-        "code": "JPN"
+        "code": "JPN",
+        "flagUrl": "https://flagcdn.com/jp.svg"
       },
       {
         "name": "Thụy Điển",
-        "code": "SWE"
+        "code": "SWE",
+        "flagUrl": "https://flagcdn.com/se.svg"
       },
       {
         "name": "Tunisia",
-        "code": "TUN"
+        "code": "TUN",
+        "flagUrl": "https://flagcdn.com/tn.svg"
       }
     ]
   },
@@ -130,19 +154,23 @@
     "teams": [
       {
         "name": "Bỉ",
-        "code": "BEL"
+        "code": "BEL",
+        "flagUrl": "https://flagcdn.com/be.svg"
       },
       {
         "name": "Ai Cập",
-        "code": "EGY"
+        "code": "EGY",
+        "flagUrl": "https://flagcdn.com/eg.svg"
       },
       {
         "name": "Iran",
-        "code": "IRN"
+        "code": "IRN",
+        "flagUrl": "https://flagcdn.com/ir.svg"
       },
       {
         "name": "New Zealand",
-        "code": "NZL"
+        "code": "NZL",
+        "flagUrl": "https://flagcdn.com/nz.svg"
       }
     ]
   },
@@ -151,19 +179,23 @@
     "teams": [
       {
         "name": "Tây Ban Nha",
-        "code": "ESP"
+        "code": "ESP",
+        "flagUrl": "https://flagcdn.com/es.svg"
       },
       {
         "name": "Cabo Verde",
-        "code": "CPV"
+        "code": "CPV",
+        "flagUrl": "https://flagcdn.com/cv.svg"
       },
       {
         "name": "Ả Rập Xê Út",
-        "code": "KSA"
+        "code": "KSA",
+        "flagUrl": "https://flagcdn.com/sa.svg"
       },
       {
         "name": "Uruguay",
-        "code": "URU"
+        "code": "URU",
+        "flagUrl": "https://flagcdn.com/uy.svg"
       }
     ]
   },
@@ -172,19 +204,23 @@
     "teams": [
       {
         "name": "Pháp",
-        "code": "FRA"
+        "code": "FRA",
+        "flagUrl": "https://flagcdn.com/fr.svg"
       },
       {
         "name": "Senegal",
-        "code": "SEN"
+        "code": "SEN",
+        "flagUrl": "https://flagcdn.com/sn.svg"
       },
       {
         "name": "Iraq",
-        "code": "IRQ"
+        "code": "IRQ",
+        "flagUrl": "https://flagcdn.com/iq.svg"
       },
       {
         "name": "Na Uy",
-        "code": "NOR"
+        "code": "NOR",
+        "flagUrl": "https://flagcdn.com/no.svg"
       }
     ]
   },
@@ -193,19 +229,23 @@
     "teams": [
       {
         "name": "Argentina",
-        "code": "ARG"
+        "code": "ARG",
+        "flagUrl": "https://flagcdn.com/ar.svg"
       },
       {
         "name": "Algeria",
-        "code": "ALG"
+        "code": "ALG",
+        "flagUrl": "https://flagcdn.com/dz.svg"
       },
       {
         "name": "Áo",
-        "code": "AUT"
+        "code": "AUT",
+        "flagUrl": "https://flagcdn.com/at.svg"
       },
       {
         "name": "Jordan",
-        "code": "JOR"
+        "code": "JOR",
+        "flagUrl": "https://flagcdn.com/jo.svg"
       }
     ]
   },
@@ -214,19 +254,23 @@
     "teams": [
       {
         "name": "Bồ Đào Nha",
-        "code": "POR"
+        "code": "POR",
+        "flagUrl": "https://flagcdn.com/pt.svg"
       },
       {
         "name": "CH Congo",
-        "code": "COD"
+        "code": "COD",
+        "flagUrl": "https://flagcdn.com/cd.svg"
       },
       {
         "name": "Uzbekistan",
-        "code": "UZB"
+        "code": "UZB",
+        "flagUrl": "https://flagcdn.com/uz.svg"
       },
       {
         "name": "Colombia",
-        "code": "COL"
+        "code": "COL",
+        "flagUrl": "https://flagcdn.com/co.svg"
       }
     ]
   },
@@ -235,19 +279,23 @@
     "teams": [
       {
         "name": "Anh",
-        "code": "ENG"
+        "code": "ENG",
+        "flagUrl": "https://flagcdn.com/gb-eng.svg"
       },
       {
         "name": "Croatia",
-        "code": "CRO"
+        "code": "CRO",
+        "flagUrl": "https://flagcdn.com/hr.svg"
       },
       {
         "name": "Ghana",
-        "code": "GHA"
+        "code": "GHA",
+        "flagUrl": "https://flagcdn.com/gh.svg"
       },
       {
         "name": "Panama",
-        "code": "PAN"
+        "code": "PAN",
+        "flagUrl": "https://flagcdn.com/pa.svg"
       }
     ]
   }

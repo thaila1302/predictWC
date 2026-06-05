@@ -21,5 +21,9 @@ service cloud.firestore {
     match /predictions/{predictionId} {
       allow read, write: if true;
     }
+
+    match /passwordResets/{resetId} {
+      allow read, write: if true;
+    }
   }
 }

@@ -1,10 +1,12 @@
 import groups from '../../data/groups.json';
+import { getFlagUrlByCode } from './teamFlags';
 
 export const teamOptions = groups
   .flatMap((group) =>
     (group.teams || []).map((team) => ({
       name: team.name || '',
       code: team.code || '',
+      flagUrl: team.flagUrl || getFlagUrlByCode(team.code),
       group: group.label || ''
     }))
   )
