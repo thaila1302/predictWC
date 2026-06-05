@@ -32,8 +32,8 @@ export default function Layout() {
   const visibleNavItems = user?.isAdmin ? navItems : navItems.filter((item) => item.to !== '/admin');
 
   return (
-    <div className="min-h-screen bg-stadium text-slate-100">
-      <header className="sticky top-0 z-40 border-b border-white/10 bg-slate-950/80 backdrop-blur-xl">
+    <div className="theme-light min-h-screen bg-slate-100 text-slate-900">
+      <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/85 backdrop-blur-xl">
         <div className="mx-auto max-w-[108rem] px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <Link to="/matches" className="flex items-center gap-3">
@@ -41,8 +41,8 @@ export default function Layout() {
                 <Trophy size={22} strokeWidth={2.5} />
               </div>
               <div>
-                <p className="font-display text-xl font-extrabold tracking-tight text-white">PredictWC</p>
-                <p className="text-xs uppercase tracking-[0.3em] text-violet-300">Worldcup 2026</p>
+                <p className="font-display text-xl font-extrabold tracking-tight text-slate-950">PredictWC</p>
+                <p className="text-xs uppercase tracking-[0.3em] text-slate-600 font-semibold">Worldcup 2026</p>
               </div>
             </Link>
 
@@ -64,7 +64,7 @@ export default function Layout() {
           </div>
 
           <nav className="mt-4 overflow-x-auto">
-            <div className="flex min-w-max justify-between gap-2 rounded-3xl border border-white/10 bg-white/5 p-2 shadow-glow lg:min-w-0 lg:w-full">
+            <div className="flex min-w-max justify-between gap-2 rounded-3xl border border-slate-200/80 bg-slate-100/80 p-2 shadow-glow lg:min-w-0 lg:w-full">
               {visibleNavItems.map((item) => {
                 const Icon = item.icon;
 
@@ -77,7 +77,7 @@ export default function Layout() {
                         'inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold whitespace-nowrap transition lg:flex-1',
                         isActive
                           ? 'bg-gradient-to-r from-violet-400 to-cyan-400 text-slate-950'
-                          : 'text-slate-200 hover:bg-white/10'
+                          : 'text-slate-700 hover:bg-white/70'
                       )
                     }
                   >

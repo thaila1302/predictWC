@@ -1,6 +1,6 @@
 export default function FirebaseSetupNotice() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-stadium px-4 text-slate-100">
+    <div className="theme-light flex min-h-screen items-center justify-center bg-stadium px-4 text-slate-900">
       <div className="glass max-w-2xl rounded-[2rem] p-8 shadow-glow">
         <p className="font-display text-3xl font-extrabold">Firebase chưa được cấu hình</p>
         <p className="mt-4 text-slate-300">

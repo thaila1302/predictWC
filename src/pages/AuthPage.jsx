@@ -164,7 +164,7 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-stadium px-4 py-10 text-slate-100">
+    <div className="theme-light flex min-h-screen items-center justify-center bg-stadium px-4 py-10 text-slate-900">
       <div className="w-full max-w-[28rem]">
         <div className="mb-8 text-center">
           <p className="mb-3 text-sm uppercase tracking-[0.3em] text-cyan-300/80">Chào mừng đến với</p>
@@ -175,8 +175,8 @@ export default function AuthPage() {
             Dự đoán từng trận, chinh phục bảng xếp hạng và tìm ra nhà vô địch.
           </p>
         </div>
-        <section className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-slate-950/80 p-6 shadow-glow ring-1 ring-white/5 backdrop-blur auth-panel">
-          <div className="mb-5 flex rounded-2xl border border-white/10 bg-white/5 p-1">
+        <section className="relative overflow-hidden rounded-[2rem] border border-slate-200/60 bg-white/95 p-6 shadow-glow ring-1 ring-slate-200/60 backdrop-blur auth-panel">
+          <div className="mb-5 flex rounded-2xl border border-slate-200/60 bg-slate-100/80 p-1">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const active = mode === tab.value;

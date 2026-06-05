@@ -4,11 +4,11 @@ export default {
   theme: {
     extend: {
       boxShadow: {
-        glow: '0 0 0 1px rgba(255,255,255,0.08), 0 20px 60px rgba(0,0,0,0.35)'
+        glow: '0 0 0 1px rgba(15,23,42,0.05), 0 20px 60px rgba(15,23,42,0.12)'
       },
       backgroundImage: {
         stadium:
-          'radial-gradient(circle at top left, rgba(139,92,246,0.24), transparent 26%), radial-gradient(circle at top right, rgba(14,165,233,0.18), transparent 22%), linear-gradient(180deg, rgba(11,16,32,1), rgba(17,24,39,1))'
+          'radial-gradient(circle at top left, rgba(56,189,248,0.18), transparent 24%), radial-gradient(circle at top right, rgba(16,185,129,0.12), transparent 22%), linear-gradient(180deg, rgba(248,250,252,1), rgba(226,232,240,1), rgba(241,245,249,1))'
       }
     }
   },

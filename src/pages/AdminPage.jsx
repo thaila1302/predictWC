@@ -376,7 +376,7 @@ function UsersTab({ users, predictionCountByUser, currentUserId, onToggleAdmin, 
                   <th className="px-4 py-4 font-semibold">Người dùng</th>
                   <th className="px-4 py-4 font-semibold">Email</th>
                   <th className="px-4 py-4 font-semibold">Tài khoản</th>
-                  <th className="px-4 py-4 font-semibold">Đúng / Sai</th>
+                  <th className="px-4 py-4 font-semibold">D? ?o?n sai</th>
                   <th className="px-4 py-4 font-semibold">Kèo</th>
                   <th className="px-4 py-4 font-semibold">Quản trị</th>
                   <th className="px-4 py-4 font-semibold">Khóa</th>
@@ -400,9 +400,7 @@ function UsersTab({ users, predictionCountByUser, currentUserId, onToggleAdmin, 
                       </td>
                       <td className="px-4 py-4 text-slate-200">{user.email || 'Chưa có email'}</td>
                       <td className="px-4 py-4 text-slate-200">@{user.username || 'chưa-có-tài-khoản'}</td>
-                      <td className="px-4 py-4 text-slate-200">
-                        đúng {user.correctPredictions || 0} / sai {user.wrongPredictions || 0}
-                      </td>
+                      <td className="px-4 py-4 font-bold text-rose-200">{user.wrongPredictions || 0}</td>
                       <td className="px-4 py-4 text-slate-200">{predictionCount}</td>
                       <td className="px-4 py-4">
                         <TogglePill
@@ -632,13 +630,17 @@ function PredictionsTab({ predictions, matches, users }) {
                       {group.rows.map((row) => {
                         const user = row.user;
                         const resultLabel =
-                          row.resultStatus === 'correct' ? 'Đúng' : row.resultStatus === 'wrong' ? 'Sai' : 'Chờ kết quả';
+                          row.resultStatus === 'wrong'
+                            ? 'Sai'
+                            : row.resultStatus === 'pending'
+                              ? 'Chờ kết quả'
+                              : 'Không sai';
                         const resultTone =
-                          row.resultStatus === 'correct'
-                            ? 'bg-emerald-500/15 text-emerald-200 ring-emerald-400/30'
-                            : row.resultStatus === 'wrong'
-                              ? 'bg-rose-500/15 text-rose-200 ring-rose-400/30'
-                              : 'bg-white/5 text-slate-300 ring-white/10';
+                          row.resultStatus === 'wrong'
+                            ? 'bg-rose-500/15 text-rose-200 ring-rose-400/30'
+                            : row.resultStatus === 'pending'
+                              ? 'bg-white/5 text-slate-300 ring-white/10'
+                              : 'bg-emerald-500/15 text-emerald-200 ring-emerald-400/30';
 
                         return (
                           <div

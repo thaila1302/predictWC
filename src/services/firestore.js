@@ -36,9 +36,11 @@ export function listenLeaderboard(callback) {
     const players = snapshot.docs
       .map((item) => ({ id: item.id, ...item.data() }))
       .sort((left, right) => {
-        const correctDiff = (right.correctPredictions || 0) - (left.correctPredictions || 0);
-        if (correctDiff !== 0) return correctDiff;
-        return (left.wrongPredictions || 0) - (right.wrongPredictions || 0);
+        const wrongDiff = (right.wrongPredictions || 0) - (left.wrongPredictions || 0);
+        if (wrongDiff !== 0) return wrongDiff;
+        return String(left.displayName || left.username || '').localeCompare(
+          String(right.displayName || right.username || '')
+        );
       });
     callback(players);
   });
@@ -100,7 +102,7 @@ export async function saveMatchAndSyncScores(matchId, payload) {
     const nextResultStatus =
       computedWinner && payload.status === 'finished'
         ? prediction.predictedResult === computedWinner
-          ? 'correct'
+          ? 'not_wrong'
           : 'wrong'
         : 'pending';
     batch.set(
@@ -120,14 +122,11 @@ export async function saveMatchAndSyncScores(matchId, payload) {
   for (const userId of affectedUserIds) {
     const targetRef = doc(db, 'users', userId);
     const predictionsByUserSnapshot = await getDocs(query(collection(db, 'predictions'), where('userId', '==', userId)));
-    let correctPredictions = 0;
     let wrongPredictions = 0;
 
     predictionsByUserSnapshot.docs.forEach((predictionDoc) => {
       const prediction = predictionDoc.data();
-      if (prediction.resultStatus === 'correct') {
-        correctPredictions += 1;
-      } else if (prediction.resultStatus === 'wrong') {
+      if (prediction.resultStatus === 'wrong') {
         wrongPredictions += 1;
       }
     });
@@ -136,7 +135,6 @@ export async function saveMatchAndSyncScores(matchId, payload) {
       targetRef,
       {
         uid: userId,
-        correctPredictions,
         wrongPredictions,
         updatedAt: serverTimestamp()
       },
