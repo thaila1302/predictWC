@@ -166,7 +166,16 @@ export default function AuthPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-stadium px-4 py-10 text-slate-100">
       <div className="w-full max-w-[28rem]">
-        <section className="rounded-[2rem] border border-white/10 bg-slate-950/80 p-6 shadow-glow ring-1 ring-white/5 backdrop-blur">
+        <div className="mb-8 text-center">
+          <p className="mb-3 text-sm uppercase tracking-[0.3em] text-cyan-300/80">Chào mừng đến với</p>
+          <h1 className="mx-auto max-w-md bg-gradient-to-r from-violet-300 via-cyan-200 to-sky-300 bg-clip-text text-4xl font-extrabold leading-tight text-transparent sm:text-5xl hero-title">
+            Predict Worldcup 2026
+          </h1>
+          <p className="mt-4 text-sm leading-6 text-slate-300/80">
+            Dự đoán từng trận, chinh phục bảng xếp hạng và tìm ra nhà vô địch.
+          </p>
+        </div>
+        <section className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-slate-950/80 p-6 shadow-glow ring-1 ring-white/5 backdrop-blur auth-panel">
           <div className="mb-5 flex rounded-2xl border border-white/10 bg-white/5 p-1">
             {tabs.map((tab) => {
               const Icon = tab.icon;

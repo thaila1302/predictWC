@@ -46,3 +46,42 @@ body {
 .font-display {
   font-family: 'Montserrat', 'Inter', system-ui, sans-serif;
 }
+
+.hero-title {
+  animation: titleGlow 10s ease-in-out infinite;
+  text-shadow: 0 0 18px rgba(56, 189, 248, 0.35);
+}
+
+.auth-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 15% 15%, rgba(56, 189, 248, 0.18), transparent 24%),
+    radial-gradient(circle at 80% 10%, rgba(168, 85, 247, 0.16), transparent 22%),
+    radial-gradient(circle at 50% 100%, rgba(134, 239, 172, 0.1), transparent 18%);
+  pointer-events: none;
+  filter: blur(18px);
+  opacity: 0.75;
+  animation: floatGlow 12s ease-in-out infinite;
+}
+
+@keyframes titleGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.45));
+  }
+  50% {
+    filter: drop-shadow(0 0 18px rgba(168, 85, 247, 0.55));
+  }
+}
+
+@keyframes floatGlow {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+    opacity: 0.75;
+  }
+  50% {
+    transform: translateY(-8px) scale(1.01);
+    opacity: 0.85;
+  }
+}
