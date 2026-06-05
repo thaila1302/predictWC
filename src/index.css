@@ -171,9 +171,23 @@ body {
   font-family: 'Montserrat', 'Inter', system-ui, sans-serif;
 }
 
-.hero-title {
-  animation: titleGlow 10s ease-in-out infinite;
-  text-shadow: 0 0 18px rgba(56, 189, 248, 0.35);
+.hero-title,
+.auth-hero-title {
+  animation: none !important;
+  letter-spacing: normal;
+  text-shadow: none !important;
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+.auth-hero-title.text-transparent {
+  color: transparent !important;
+  background-clip: text !important;
+  -webkit-background-clip: text !important;
+}
+
+.auth-hero-copy {
+  text-shadow: none !important;
 }
 
 .auth-panel::before {
@@ -181,13 +195,13 @@ body {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 15% 15%, rgba(56, 189, 248, 0.18), transparent 24%),
-    radial-gradient(circle at 80% 10%, rgba(168, 85, 247, 0.16), transparent 22%),
-    radial-gradient(circle at 50% 100%, rgba(134, 239, 172, 0.1), transparent 18%);
+    radial-gradient(circle at 15% 15%, rgba(56, 189, 248, 0.08), transparent 18%),
+    radial-gradient(circle at 80% 10%, rgba(168, 85, 247, 0.08), transparent 18%),
+    radial-gradient(circle at 50% 100%, rgba(134, 239, 172, 0.05), transparent 14%);
   pointer-events: none;
-  filter: blur(18px);
-  opacity: 0.75;
-  animation: floatGlow 12s ease-in-out infinite;
+  filter: blur(24px);
+  opacity: 0.28;
+  animation: floatGlow 16s ease-in-out infinite;
 }
 
 @keyframes titleGlow {

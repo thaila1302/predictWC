@@ -8,7 +8,7 @@ export default {
       },
       backgroundImage: {
         stadium:
-          'radial-gradient(circle at top left, rgba(56,189,248,0.18), transparent 24%), radial-gradient(circle at top right, rgba(16,185,129,0.12), transparent 22%), linear-gradient(180deg, rgba(248,250,252,1), rgba(226,232,240,1), rgba(241,245,249,1))'
+          'radial-gradient(circle at top left, rgba(56,189,248,0.12), transparent 20%), radial-gradient(circle at top right, rgba(16,185,129,0.1), transparent 18%), linear-gradient(180deg, rgba(248,250,252,1), rgba(238,246,255,1), rgba(255,255,255,1))'
       }
     }
   },

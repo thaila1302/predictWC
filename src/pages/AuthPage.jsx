@@ -164,14 +164,16 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="theme-light flex min-h-screen items-center justify-center bg-stadium px-4 py-10 text-slate-900">
+    <div className="theme-light flex min-h-screen items-center justify-center bg-gradient-to-b from-slate-50 via-white to-slate-100 px-4 py-10 text-slate-900">
       <div className="w-full max-w-[28rem]">
-        <div className="mb-8 text-center">
-          <p className="mb-3 text-sm uppercase tracking-[0.3em] text-cyan-300/80">Chào mừng đến với</p>
-          <h1 className="mx-auto max-w-md bg-gradient-to-r from-violet-300 via-cyan-200 to-sky-300 bg-clip-text text-4xl font-extrabold leading-tight text-transparent sm:text-5xl hero-title">
+        <div className="mb-8 text-center auth-hero-copy">
+          <p className="mb-3 inline-flex rounded-full border border-cyan-300/40 bg-cyan-100/80 px-4 py-2 text-xs font-black uppercase tracking-[0.28em] text-cyan-700 shadow-sm">
+            Chào mừng đến với
+          </p>
+          <h1 className="mx-auto max-w-md text-4xl font-black leading-tight sm:text-5xl auth-hero-title bg-gradient-to-r from-cyan-500 via-slate-900 to-violet-600 bg-clip-text text-transparent">
             Predict Worldcup 2026
           </h1>
-          <p className="mt-4 text-sm leading-6 text-slate-300/80">
+          <p className="mx-auto mt-4 max-w-sm text-sm font-semibold leading-6 text-slate-700">
             Dự đoán từng trận, chinh phục bảng xếp hạng và tìm ra nhà vô địch.
           </p>
         </div>
