@@ -17,14 +17,14 @@ export default function PredictionButtons({ value, disabled, onChange, homeLabel
             disabled={disabled}
             onClick={() => onChange(option.value)}
             className={cn(
-              'rounded-2xl border px-4 py-3 text-sm font-bold transition',
+              'min-w-0 rounded-2xl border px-3 py-3 text-sm font-bold transition sm:px-4',
               active
                 ? `border-transparent bg-gradient-to-r ${option.accent} text-slate-950 shadow-lg shadow-black/20`
                 : 'border-white/10 bg-white/5 text-white hover:bg-white/10',
               disabled && 'cursor-not-allowed opacity-50'
             )}
           >
-            {option.label}
+            <span className="block truncate">{option.label}</span>
           </button>
         );
       })}

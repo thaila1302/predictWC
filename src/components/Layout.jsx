@@ -34,20 +34,22 @@ export default function Layout() {
   return (
     <div className="theme-light min-h-screen bg-slate-100 text-slate-900">
       <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/85 backdrop-blur-xl">
-        <div className="mx-auto max-w-[108rem] px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <Link to="/matches" className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-400 via-fuchsia-500 to-cyan-400 text-slate-950 shadow-glow">
-                <Trophy size={22} strokeWidth={2.5} />
+        <div className="mx-auto max-w-[108rem] px-3 py-3 sm:px-6 sm:py-4 lg:px-8">
+          <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-4">
+            <Link to="/matches" className="flex min-w-0 items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-400 via-fuchsia-500 to-cyan-400 text-slate-950 shadow-glow sm:h-11 sm:w-11">
+                <Trophy size={20} strokeWidth={2.5} />
               </div>
-              <div>
-                <p className="font-display text-xl font-extrabold tracking-tight text-slate-950">PredictWC</p>
-                <p className="text-xs uppercase tracking-[0.3em] text-slate-600 font-semibold">Worldcup 2026</p>
+              <div className="min-w-0">
+                <p className="font-display text-lg font-extrabold tracking-tight text-slate-950 sm:text-xl">PredictWC</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-600 sm:text-xs sm:tracking-[0.3em]">
+                  Worldcup 2026
+                </p>
               </div>
             </Link>
 
-            <div className="flex items-center gap-3">
-              <div className="hidden items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-200 md:flex">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="hidden items-center gap-2 rounded-full border border-slate-200/80 bg-white/70 px-4 py-2 text-sm font-semibold text-slate-700 md:flex">
                 <User2 size={14} />
                 {user?.displayName || user?.username || 'Người chơi'}
               </div>
@@ -55,16 +57,17 @@ export default function Layout() {
               <button
                 type="button"
                 onClick={logout}
-                className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
+                className="inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/70 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-white sm:px-4 sm:text-sm"
+                aria-label="Đăng xuất"
               >
                 <LogOut size={14} />
-                Đăng xuất
+                <span className="hidden sm:inline">Đăng xuất</span>
               </button>
             </div>
           </div>
 
-          <nav className="mt-4 overflow-x-auto">
-            <div className="flex min-w-max justify-between gap-2 rounded-3xl border border-slate-200/80 bg-slate-100/80 p-2 shadow-glow lg:min-w-0 lg:w-full">
+          <nav className="-mx-3 mt-3 overflow-x-auto px-3 sm:mx-0 sm:mt-4 sm:px-0">
+            <div className="flex min-w-max justify-between gap-1 rounded-2xl border border-slate-200/80 bg-slate-100/80 p-1.5 shadow-glow sm:gap-2 sm:rounded-3xl sm:p-2 lg:min-w-0 lg:w-full">
               {visibleNavItems.map((item) => {
                 const Icon = item.icon;
 
@@ -74,14 +77,14 @@ export default function Layout() {
                     to={item.to}
                     className={({ isActive }) =>
                       cn(
-                        'inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold whitespace-nowrap transition lg:flex-1',
+                        'inline-flex items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-xs font-semibold whitespace-nowrap transition sm:gap-2 sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm lg:flex-1',
                         isActive
                           ? 'bg-gradient-to-r from-violet-400 to-cyan-400 text-slate-950'
                           : 'text-slate-700 hover:bg-white/70'
                       )
                     }
                   >
-                    <Icon size={18} />
+                    <Icon size={16} />
                     {item.label}
                   </NavLink>
                 );
@@ -91,7 +94,7 @@ export default function Layout() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-[108rem] px-4 py-6 sm:px-6 lg:px-8">
+      <main className="mx-auto max-w-[108rem] px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
         <section className="min-w-0">
           <Outlet />
         </section>

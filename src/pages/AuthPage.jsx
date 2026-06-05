@@ -164,21 +164,21 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="theme-light flex min-h-screen items-center justify-center bg-gradient-to-b from-slate-50 via-white to-slate-100 px-4 py-10 text-slate-900">
-      <div className="w-full max-w-[28rem]">
-        <div className="mb-8 text-center auth-hero-copy">
+    <div className="theme-light flex min-h-svh items-center justify-center bg-gradient-to-b from-slate-50 via-white to-slate-100 px-3 py-6 text-slate-900 sm:px-4 sm:py-10">
+      <div className="w-full max-w-md">
+        <div className="mb-5 text-center auth-hero-copy sm:mb-8">
           <p className="mb-3 inline-flex rounded-full border border-cyan-300/40 bg-cyan-100/80 px-4 py-2 text-xs font-black uppercase tracking-[0.28em] text-cyan-700 shadow-sm">
             Chào mừng đến với
           </p>
-          <h1 className="mx-auto max-w-md text-4xl font-black leading-tight sm:text-5xl auth-hero-title bg-gradient-to-r from-cyan-500 via-slate-900 to-violet-600 bg-clip-text text-transparent">
+          <h1 className="mx-auto max-w-md text-3xl font-black leading-tight sm:text-5xl auth-hero-title bg-gradient-to-r from-cyan-500 via-slate-900 to-violet-600 bg-clip-text text-transparent">
             Predict Worldcup 2026
           </h1>
           <p className="mx-auto mt-4 max-w-sm text-sm font-semibold leading-6 text-slate-700">
             Dự đoán từng trận, chinh phục bảng xếp hạng và tìm ra nhà vô địch.
           </p>
         </div>
-        <section className="relative overflow-hidden rounded-[2rem] border border-slate-200/60 bg-white/95 p-6 shadow-glow ring-1 ring-slate-200/60 backdrop-blur auth-panel">
-          <div className="mb-5 flex rounded-2xl border border-slate-200/60 bg-slate-100/80 p-1">
+        <section className="relative overflow-hidden rounded-[1.5rem] border border-slate-200/60 bg-white/95 p-4 shadow-glow ring-1 ring-slate-200/60 backdrop-blur auth-panel sm:rounded-[2rem] sm:p-6">
+          <div className="mb-5 flex rounded-xl border border-slate-200/60 bg-slate-100/80 p-1 sm:rounded-2xl">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const active = mode === tab.value;
@@ -192,7 +192,7 @@ export default function AuthPage() {
                     setError('');
                     setNotice('');
                   }}
-                  className={`flex-1 rounded-2xl px-4 py-3 text-sm font-bold transition ${
+                  className={`flex-1 rounded-xl px-3 py-2.5 text-xs font-bold transition sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm ${
                     active
                       ? 'bg-gradient-to-r from-violet-400 to-cyan-400 text-slate-950'
                       : 'text-slate-300'
@@ -220,13 +220,13 @@ export default function AuthPage() {
           ) : null}
 
           {mode === 'login' ? (
-            <form className="space-y-4" onSubmit={handleLogin}>
+            <form className="space-y-3.5 sm:space-y-4" onSubmit={handleLogin}>
               <label className="block space-y-2">
                 <span className="text-sm font-medium text-slate-300">Tài khoản</span>
                 <input
                   value={loginForm.username}
                   onChange={(event) => setLoginForm((current) => ({ ...current, username: event.target.value }))}
-                  className="w-full rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-white outline-none transition focus:border-cyan-400/50"
+                  className="w-full rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-base text-white outline-none transition focus:border-cyan-400/50"
                 />
               </label>
 
@@ -236,7 +236,7 @@ export default function AuthPage() {
                   type="password"
                   value={loginForm.password}
                   onChange={(event) => setLoginForm((current) => ({ ...current, password: event.target.value }))}
-                  className="w-full rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-white outline-none transition focus:border-cyan-400/50"
+                  className="w-full rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-base text-white outline-none transition focus:border-cyan-400/50"
                 />
               </label>
 
@@ -261,13 +261,13 @@ export default function AuthPage() {
               </button>
             </form>
           ) : mode === 'register' ? (
-            <form className="space-y-4" onSubmit={handleRegister}>
+            <form className="space-y-3.5 sm:space-y-4" onSubmit={handleRegister}>
               <label className="block space-y-2">
                 <span className="text-sm font-medium text-slate-300">Họ và tên</span>
                 <input
                   value={registerForm.displayName}
                   onChange={(event) => setRegisterForm((current) => ({ ...current, displayName: event.target.value }))}
-                  className="w-full rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-white outline-none transition focus:border-cyan-400/50"
+                  className="w-full rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-base text-white outline-none transition focus:border-cyan-400/50"
                 />
               </label>
 
@@ -277,7 +277,7 @@ export default function AuthPage() {
                   type="email"
                   value={registerForm.email}
                   onChange={(event) => setRegisterForm((current) => ({ ...current, email: event.target.value }))}
-                  className="w-full rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-white outline-none transition focus:border-cyan-400/50"
+                  className="w-full rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-base text-white outline-none transition focus:border-cyan-400/50"
                 />
               </label>
 
@@ -286,7 +286,7 @@ export default function AuthPage() {
                 <input
                   value={registerForm.username}
                   onChange={(event) => setRegisterForm((current) => ({ ...current, username: event.target.value }))}
-                  className="w-full rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-white outline-none transition focus:border-cyan-400/50"
+                  className="w-full rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-base text-white outline-none transition focus:border-cyan-400/50"
                 />
               </label>
 
@@ -296,7 +296,7 @@ export default function AuthPage() {
                   type="password"
                   value={registerForm.password}
                   onChange={(event) => setRegisterForm((current) => ({ ...current, password: event.target.value }))}
-                  className="w-full rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-white outline-none transition focus:border-cyan-400/50"
+                  className="w-full rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-base text-white outline-none transition focus:border-cyan-400/50"
                 />
               </label>
 
@@ -308,7 +308,7 @@ export default function AuthPage() {
                   onChange={(event) =>
                     setRegisterForm((current) => ({ ...current, confirmPassword: event.target.value }))
                   }
-                  className="w-full rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-white outline-none transition focus:border-cyan-400/50"
+                  className="w-full rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-base text-white outline-none transition focus:border-cyan-400/50"
                 />
               </label>
 
@@ -340,7 +340,7 @@ export default function AuthPage() {
                     value={resetForm.identifier}
                     disabled={resetCodeSent}
                     onChange={(event) => setResetForm((current) => ({ ...current, identifier: event.target.value }))}
-                    className="w-full rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-400/50 disabled:cursor-not-allowed disabled:opacity-70"
+                    className="w-full rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-base text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-400/50 disabled:cursor-not-allowed disabled:opacity-70"
                   />
                 </label>
 
@@ -379,7 +379,7 @@ export default function AuthPage() {
                         value={resetForm.code}
                         onChange={(event) => setResetForm((current) => ({ ...current, code: event.target.value }))}
                         placeholder="Nhập mã 6 số"
-                        className="w-full rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-400/50"
+                        className="w-full rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-base text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-400/50"
                       />
                     </label>
 
@@ -390,7 +390,7 @@ export default function AuthPage() {
                         value={resetForm.newPassword}
                         onChange={(event) => setResetForm((current) => ({ ...current, newPassword: event.target.value }))}
                         placeholder="Nhập mật khẩu mới"
-                        className="w-full rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-400/50"
+                        className="w-full rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-base text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-400/50"
                       />
                     </label>
 
@@ -403,7 +403,7 @@ export default function AuthPage() {
                           setResetForm((current) => ({ ...current, confirmPassword: event.target.value }))
                         }
                         placeholder="Nhập lại mật khẩu mới"
-                        className="w-full rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-400/50"
+                        className="w-full rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-base text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-400/50"
                       />
                     </label>
                   </div>

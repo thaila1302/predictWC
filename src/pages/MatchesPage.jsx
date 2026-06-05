@@ -44,16 +44,16 @@ function TeamBadge({ team, code, logo, align = 'left' }) {
   const isRight = align === 'right';
 
   return (
-    <div className={`flex items-center gap-3 ${isRight ? 'flex-row-reverse text-right' : ''}`}>
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-900/80 p-2 ring-1 ring-white/10">
+    <div className={`flex min-w-0 items-center gap-2 sm:gap-3 ${isRight ? 'flex-row-reverse justify-start text-right' : ''}`}>
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-900/80 p-2 ring-1 ring-white/10 sm:h-10 sm:w-10">
         {logo ? (
           <img src={logo} alt={team} className="h-full w-full object-contain" />
         ) : (
           <span className="text-[11px] font-black text-white">{code || (team || '?').slice(0, 2).toUpperCase()}</span>
         )}
       </div>
-      <div className="min-w-0">
-        <p className="truncate text-base font-bold text-white sm:text-lg">{team}</p>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-xs font-bold leading-tight text-white sm:text-lg">{team}</p>
       </div>
     </div>
   );
@@ -63,11 +63,11 @@ function MatchSeparatorIcon({ homeScore, awayScore }) {
   const hasScore = homeScore !== null && homeScore !== undefined && awayScore !== null && awayScore !== undefined;
 
   return (
-    <div className="flex items-center justify-center rounded-full border border-white/10 bg-white/5 px-4 py-2 shadow-sm">
+    <div className="flex items-center justify-center rounded-full border border-white/10 bg-white/5 px-3 py-1.5 shadow-sm sm:px-4 sm:py-2">
       <div className="flex items-center gap-2 text-slate-200">
-        <span className="text-2xl font-black leading-none">{hasScore ? homeScore : '-'}</span>
-        <span className="text-2xl font-black leading-none">:</span>
-        <span className="text-2xl font-black leading-none">{hasScore ? awayScore : '-'}</span>
+        <span className="text-xl font-black leading-none sm:text-2xl">{hasScore ? homeScore : '-'}</span>
+        <span className="text-xl font-black leading-none sm:text-2xl">:</span>
+        <span className="text-xl font-black leading-none sm:text-2xl">{hasScore ? awayScore : '-'}</span>
       </div>
     </div>
   );
@@ -80,7 +80,7 @@ function MatchCard({ match, prediction, onPredict, saving }) {
 
   return (
     <article className="self-start overflow-hidden rounded-[1.25rem] border border-white/10 bg-slate-950/70 shadow-glow ring-1 ring-white/5 transition hover:border-white/20">
-      <div className="p-4">
+      <div className="p-3 sm:p-4">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <StatusBadge status={match.status || 'upcoming'} />
@@ -89,16 +89,16 @@ function MatchCard({ match, prediction, onPredict, saving }) {
             </span>
           </div>
 
-          <div className="flex items-center gap-2 text-xs font-medium text-slate-300">
+          <div className="flex items-center gap-2 text-[11px] font-medium text-slate-300 sm:text-xs">
             <Clock3 size={14} />
             <span>{formatDateTime(match.matchTime)}</span>
           </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-[1fr_auto_1fr] md:items-center">
+        <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 sm:gap-4">
           <TeamBadge team={match.homeTeam} code={match.homeCode} logo={match.homeLogo} />
 
-          <div className="mx-auto flex min-h-[88px] min-w-[128px] flex-col items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-center">
+          <div className="mx-auto flex min-h-[58px] min-w-[74px] flex-col items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-2 py-2 text-center sm:min-h-[88px] sm:min-w-[128px] sm:px-4 sm:py-3">
             <MatchSeparatorIcon homeScore={match.homeScore} awayScore={match.awayScore} />
           </div>
 
@@ -117,7 +117,7 @@ function MatchCard({ match, prediction, onPredict, saving }) {
         ) : null}
       </div>
 
-      <div className="border-t border-white/10 bg-white/5 p-4 pt-3">
+      <div className="border-t border-white/10 bg-white/5 p-3 pt-3 sm:p-4">
         <PredictionButtons
           value={prediction?.predictedResult}
           disabled={locked || saving}
@@ -202,13 +202,13 @@ export default function MatchesPage() {
         {sections.map((section) => (
           <section
             key={section.key}
-            className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-slate-950/70 shadow-glow ring-1 ring-white/5"
+            className="overflow-hidden rounded-[1.25rem] border border-white/10 bg-slate-950/70 shadow-glow ring-1 ring-white/5 sm:rounded-[1.5rem]"
           >
-            <div className="border-b border-white/10 bg-white/5 px-5 py-4">
+            <div className="border-b border-white/10 bg-white/5 px-4 py-3 sm:px-5 sm:py-4">
               <h2 className="font-display text-xl font-black text-white">Vòng bảng - {section.label}</h2>
             </div>
 
-            <div className="grid items-start gap-4 p-4 md:grid-cols-2">
+            <div className="grid items-start gap-3 p-3 sm:gap-4 sm:p-4 md:grid-cols-2">
               {section.matches.map((match) => {
                 const prediction = predictionMap.get(match.id);
 
