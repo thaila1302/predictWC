@@ -149,6 +149,27 @@ export async function updateUserAccess(uid, updates) {
   });
 }
 
+export async function updateUserDisplayName(uid, displayName) {
+  const trimmedDisplayName = String(displayName || '').trim();
+
+  if (!uid) {
+    throw new Error('Không tìm thấy tài khoản.');
+  }
+
+  if (trimmedDisplayName.length < 2) {
+    throw new Error('Tên hiển thị phải có ít nhất 2 ký tự.');
+  }
+
+  if (trimmedDisplayName.length > 50) {
+    throw new Error('Tên hiển thị không được vượt quá 50 ký tự.');
+  }
+
+  await updateDoc(doc(db, 'users', uid), {
+    displayName: trimmedDisplayName,
+    updatedAt: serverTimestamp()
+  });
+}
+
 export async function registerWithUsername({ displayName, email, username, password }) {
   const trimmedDisplayName = String(displayName || '').trim();
   const normalizedEmail = normalizeEmail(email);

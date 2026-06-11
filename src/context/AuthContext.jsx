@@ -3,7 +3,8 @@ import {
   loginWithUsername,
   migrateLegacyLocalAccountsToFirestore,
   registerWithUsername,
-  subscribeAccountByUid
+  subscribeAccountByUid,
+  updateUserDisplayName
 } from '../services/auth';
 
 const AUTH_SESSION_KEY = 'predictwc_auth_uid';
@@ -108,6 +109,14 @@ export function AuthProvider({ children }) {
     setSessionUid('');
   };
 
+  const updateDisplayName = async (displayName) => {
+    if (!user?.uid) {
+      throw new Error('Không tìm thấy tài khoản.');
+    }
+
+    await updateUserDisplayName(user.uid, displayName);
+  };
+
   const value = useMemo(
     () => ({
       user,
@@ -115,6 +124,7 @@ export function AuthProvider({ children }) {
       isAuthenticated: Boolean(user),
       login,
       register,
+      updateDisplayName,
       logout
     }),
     [user, loading, bootstrapping]

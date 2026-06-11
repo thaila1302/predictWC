@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet } from 'react-router-dom';
 import {
   Award,
@@ -8,9 +9,12 @@ import {
   LogOut,
   Medal,
   Network,
+  Pencil,
+  Save,
   Shield,
   Trophy,
-  User2
+  User2,
+  X
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useAuth } from '../context/AuthContext';
@@ -27,9 +31,102 @@ const navItems = [
   { to: '/admin', label: 'Quản trị', icon: Shield }
 ];
 
+function RenameDialog({ open, currentName, saving, error, onClose, onSave }) {
+  const [displayName, setDisplayName] = useState(currentName || '');
+
+  useEffect(() => {
+    if (open) setDisplayName(currentName || '');
+  }, [currentName, open]);
+
+  if (!open) return null;
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    onSave(displayName);
+  };
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/45 px-4 backdrop-blur-sm" onMouseDown={onClose}>
+      <form
+        onSubmit={handleSubmit}
+        onMouseDown={(event) => event.stopPropagation()}
+        className="w-full max-w-md rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-2xl sm:p-6"
+      >
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className="font-display text-xl font-black text-slate-950">Đổi tên hiển thị</h2>
+            <p className="mt-1 text-sm text-slate-500">Tên mới sẽ hiển thị trên header và bảng người chơi.</p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-full border border-slate-200 p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-950"
+            aria-label="Đóng"
+          >
+            <X size={17} />
+          </button>
+        </div>
+
+        <label className="mt-5 block space-y-2">
+          <span className="text-sm font-bold text-slate-700">Tên hiển thị</span>
+          <input
+            autoFocus
+            maxLength={50}
+            value={displayName}
+            onChange={(event) => setDisplayName(event.target.value)}
+            className="w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-base font-semibold text-slate-950 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-100"
+          />
+        </label>
+
+        {error ? (
+          <div className="mt-4 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">
+            {error}
+          </div>
+        ) : null}
+
+        <div className="mt-5 grid grid-cols-2 gap-3">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={saving}
+            className="rounded-2xl border border-slate-300 bg-slate-100 px-4 py-3 font-bold text-slate-700 transition hover:bg-slate-200 disabled:opacity-50"
+          >
+            Hủy
+          </button>
+          <button
+            type="submit"
+            disabled={saving}
+            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-violet-400 to-cyan-400 px-4 py-3 font-black text-slate-950 transition hover:brightness-105 disabled:opacity-50"
+          >
+            <Save size={16} />
+            {saving ? 'Đang lưu...' : 'Lưu tên'}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
 export default function Layout() {
-  const { user, logout } = useAuth();
+  const { user, logout, updateDisplayName } = useAuth();
+  const [renameOpen, setRenameOpen] = useState(false);
+  const [renameSaving, setRenameSaving] = useState(false);
+  const [renameError, setRenameError] = useState('');
   const visibleNavItems = user?.isAdmin ? navItems : navItems.filter((item) => item.to !== '/admin');
+
+  const handleRename = async (displayName) => {
+    setRenameError('');
+    setRenameSaving(true);
+
+    try {
+      await updateDisplayName(displayName);
+      setRenameOpen(false);
+    } catch (error) {
+      setRenameError(error.message || 'Không thể đổi tên. Vui lòng thử lại.');
+    } finally {
+      setRenameSaving(false);
+    }
+  };
 
   return (
     <div className="theme-light min-h-screen bg-slate-100 text-slate-900">
@@ -49,10 +146,19 @@ export default function Layout() {
             </Link>
 
             <div className="flex items-center gap-2 sm:gap-3">
-              <div className="hidden items-center gap-2 rounded-full border border-slate-200/80 bg-white/70 px-4 py-2 text-sm font-semibold text-slate-700 md:flex">
-                <User2 size={14} />
-                {user?.displayName || user?.username || 'Người chơi'}
-              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setRenameError('');
+                  setRenameOpen(true);
+                }}
+                className="group inline-flex max-w-[10rem] items-center gap-2 rounded-full border border-slate-200/80 bg-white/70 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50 sm:max-w-[15rem] sm:px-4 sm:text-sm"
+                title="Đổi tên hiển thị"
+              >
+                <User2 size={14} className="shrink-0" />
+                <span className="truncate">{user?.displayName || user?.username || 'Người chơi'}</span>
+                <Pencil size={12} className="hidden shrink-0 text-cyan-600 group-hover:block sm:block" />
+              </button>
 
               <button
                 type="button"
@@ -99,6 +205,17 @@ export default function Layout() {
           <Outlet />
         </section>
       </main>
+
+      <RenameDialog
+        open={renameOpen}
+        currentName={user?.displayName || ''}
+        saving={renameSaving}
+        error={renameError}
+        onClose={() => {
+          if (!renameSaving) setRenameOpen(false);
+        }}
+        onSave={handleRename}
+      />
     </div>
   );
 }
