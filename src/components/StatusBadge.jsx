@@ -6,9 +6,15 @@ const styles = {
   finished: 'bg-slate-200/10 text-slate-200 ring-slate-300/20'
 };
 
-export default function StatusBadge({ status }) {
+export default function StatusBadge({ status, spotlight = false }) {
   return (
-    <span className={cn('inline-flex items-center rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider ring-1', styles[status] || styles.upcoming)}>
+    <span
+      className={cn(
+        'inline-flex items-center rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider ring-1',
+        styles[status] || styles.upcoming,
+        spotlight && status === 'upcoming' && 'match-spotlight-status'
+      )}
+    >
       {getMatchStatusLabel(status)}
     </span>
   );

@@ -92,13 +92,14 @@ export async function saveMatchAndSyncScores(matchId, payload) {
   );
 
   const predictionsSnapshot = await getDocs(query(collection(db, 'predictions'), where('matchId', '==', matchId)));
-  if (predictionsSnapshot.empty) return;
-
-  const affectedUserIds = new Set();
+  const usersSnapshot = await getDocs(collection(db, 'users'));
+  const affectedUserIds = new Set(usersSnapshot.docs.map((userDoc) => userDoc.id));
+  const predictedUserIds = new Set();
   const batch = writeBatch(db);
 
   predictionsSnapshot.docs.forEach((predictionDoc) => {
     const prediction = predictionDoc.data();
+    predictedUserIds.add(prediction.userId);
     const nextResultStatus =
       computedWinner && payload.status === 'finished'
         ? prediction.predictedResult === computedWinner
@@ -116,6 +117,28 @@ export async function saveMatchAndSyncScores(matchId, payload) {
 
     affectedUserIds.add(prediction.userId);
   });
+
+  if (computedWinner && payload.status === 'finished') {
+    usersSnapshot.docs.forEach((userDoc) => {
+      const userId = userDoc.id;
+      if (predictedUserIds.has(userId)) return;
+
+      const missedPredictionRef = doc(db, 'predictions', `${userId}_${matchId}`);
+      batch.set(
+        missedPredictionRef,
+        {
+          userId,
+          matchId,
+          predictedResult: null,
+          resultStatus: 'wrong',
+          autoMissed: true,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        },
+        { merge: true }
+      );
+    });
+  }
 
   await batch.commit();
 

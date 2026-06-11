@@ -45,6 +45,20 @@ export function formatVietnamDayKey(value) {
   return date.toISOString().slice(0, 10);
 }
 
+export function getVietnamCalendarDayKey(value) {
+  const date = toDate(value);
+  if (!date || Number.isNaN(date.getTime())) return 'tbd';
+
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: VIETNAM_TIME_ZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).formatToParts(date);
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
 export function parseVietnamDateTimeLocal(value) {
   if (!value) return null;
   const [datePart, timePart] = value.split('T');

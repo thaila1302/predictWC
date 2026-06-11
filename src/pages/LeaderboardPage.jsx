@@ -3,6 +3,14 @@ import { ShieldAlert, UsersRound } from 'lucide-react';
 import SectionHeader from '../components/SectionHeader';
 import { listenLeaderboard } from '../services/firestore';
 
+function formatLostMoney(wrongPredictions) {
+  return new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND',
+    maximumFractionDigits: 0
+  }).format((wrongPredictions || 0) * 10000);
+}
+
 export default function LeaderboardPage() {
   const [players, setPlayers] = useState([]);
 
@@ -34,6 +42,7 @@ export default function LeaderboardPage() {
               <tr>
                 <th className="px-4 py-3 sm:px-5 sm:py-4">Người chơi</th>
                 <th className="px-4 py-3 text-right sm:px-5 sm:py-4">Dự đoán sai</th>
+                <th className="px-4 py-3 text-right sm:px-5 sm:py-4">Số tiền đã ra đi</th>
               </tr>
             </thead>
             <tbody>
@@ -48,6 +57,9 @@ export default function LeaderboardPage() {
                       <ShieldAlert size={16} />
                       {player.wrongPredictions || 0}
                     </span>
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-4 text-right font-black text-rose-700 sm:px-5">
+                    {formatLostMoney(player.wrongPredictions)}
                   </td>
                 </tr>
               ))}

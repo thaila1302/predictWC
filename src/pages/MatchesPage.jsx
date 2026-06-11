@@ -4,19 +4,22 @@ import StatusBadge from '../components/StatusBadge';
 import PredictionButtons from '../components/PredictionButtons';
 import PredictionConfirmDialog from '../components/PredictionConfirmDialog';
 import MatchCountdown from '../components/MatchCountdown';
-import { formatDateTime, formatVietnamDay, formatVietnamDayKey, isMatchStarted, isPredictionLocked, toDate } from '../lib/utils';
+import { formatDateTime, formatVietnamDay, getVietnamCalendarDayKey, isMatchStarted, isPredictionLocked, toDate } from '../lib/utils';
 import { listenMatches, listenUserPredictions, savePrediction } from '../services/firestore';
 import { useDevelopMode } from '../context/DevelopModeContext';
 import { useAuth } from '../context/AuthContext';
 import { mergeMatchesById } from '../lib/matchMerge';
+import useMatchSpotlight from '../hooks/useMatchSpotlight';
+import useCurrentTime from '../hooks/useCurrentTime';
 import seedMatches from '../../data/matches.json';
 
 function formatDayKey(value) {
-  return formatVietnamDayKey(value);
+  return getVietnamCalendarDayKey(value);
 }
 
-function groupMatchesByDay(matches) {
+function groupMatchesByDay(matches, now) {
   const grouped = new Map();
+  const todayKey = getVietnamCalendarDayKey(now);
 
   matches.forEach((match) => {
     const key = formatDayKey(match.matchTime);
@@ -27,17 +30,27 @@ function groupMatchesByDay(matches) {
   });
 
   return Array.from(grouped.entries())
-    .map(([key, items]) => ({
-      key,
-      label: formatVietnamDay(items[0]?.matchTime),
-      sortTime: toDate(items[0]?.matchTime)?.getTime() || 0,
-      matches: [...items].sort((left, right) => {
+    .map(([key, items]) => {
+      const sortedMatches = [...items].sort((left, right) => {
         const leftTime = toDate(left.matchTime)?.getTime() || 0;
         const rightTime = toDate(right.matchTime)?.getTime() || 0;
         return leftTime - rightTime;
-      })
-    }))
-    .sort((left, right) => left.sortTime - right.sortTime);
+      });
+      const allFinished = sortedMatches.every((match) => match.status === 'finished');
+      const completed = allFinished || (key !== 'tbd' && key < todayKey);
+
+      return {
+        key,
+        label: formatVietnamDay(items[0]?.matchTime),
+        sortTime: toDate(items[0]?.matchTime)?.getTime() || 0,
+        completed,
+        matches: sortedMatches
+      };
+    })
+    .sort((left, right) => {
+      if (left.completed !== right.completed) return left.completed ? 1 : -1;
+      return left.completed ? right.sortTime - left.sortTime : left.sortTime - right.sortTime;
+    });
 }
 
 function TeamBadge({ team, code, logo, align = 'left' }) {
@@ -75,15 +88,17 @@ function MatchSeparatorIcon({ homeScore, awayScore }) {
 
 function MatchCard({ match, prediction, onPredict, saving }) {
   const started = isMatchStarted(match.matchTime);
-  const locked = isPredictionLocked(match.matchTime);
+  const finished = match.status === 'finished';
+  const locked = finished || isPredictionLocked(match.matchTime);
+  const isSpotlightMatch = useMatchSpotlight(match.matchTime) && match.status !== 'finished';
   const lockLabel = started ? 'Đã khóa' : 'Khóa trước 30 phút';
 
   return (
-    <article className="self-start overflow-hidden rounded-[1.25rem] border border-white/10 bg-slate-950/70 shadow-glow ring-1 ring-white/5 transition hover:border-white/20">
+    <article className={`self-start overflow-hidden rounded-[1.25rem] border border-white/10 bg-slate-950/70 shadow-glow ring-1 ring-white/5 transition hover:border-white/20 ${isSpotlightMatch ? 'match-spotlight-card' : ''} ${finished ? 'finished-match-card' : ''}`}>
       <div className="p-3 sm:p-4">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <StatusBadge status={match.status || 'upcoming'} />
+            <StatusBadge status={match.status || 'upcoming'} spotlight={isSpotlightMatch} />
             <span className="text-[11px] uppercase tracking-[0.24em] text-slate-400">
               {match.group ? `Bảng ${match.group}` : 'Loại trực tiếp'}
             </span>
@@ -137,6 +152,7 @@ export default function MatchesPage() {
   const [pendingPrediction, setPendingPrediction] = useState(null);
   const { applyMatchOverrides } = useDevelopMode();
   const { user } = useAuth();
+  const now = useCurrentTime();
 
   useEffect(() => {
     return listenMatches((remoteMatches) => {
@@ -156,10 +172,10 @@ export default function MatchesPage() {
 
   const predictionMap = useMemo(() => new Map(predictions.map((item) => [item.matchId, item])), [predictions]);
   const displayMatches = useMemo(() => applyMatchOverrides(matches), [applyMatchOverrides, matches]);
-  const sections = useMemo(() => groupMatchesByDay(displayMatches), [displayMatches]);
+  const sections = useMemo(() => groupMatchesByDay(displayMatches, now), [displayMatches, now]);
 
   const handlePredict = (match, value, labels) => {
-    if (isPredictionLocked(match.matchTime)) {
+    if (match.status === 'finished' || isPredictionLocked(match.matchTime)) {
       return;
     }
 
@@ -202,7 +218,7 @@ export default function MatchesPage() {
         {sections.map((section) => (
           <section
             key={section.key}
-            className="overflow-hidden rounded-[1.25rem] border border-white/10 bg-slate-950/70 shadow-glow ring-1 ring-white/5 sm:rounded-[1.5rem]"
+            className={`overflow-hidden rounded-[1.25rem] border border-white/10 bg-slate-950/70 shadow-glow ring-1 ring-white/5 transition sm:rounded-[1.5rem] ${section.completed ? 'completed-match-day' : ''}`}
           >
             <div className="border-b border-white/10 bg-white/5 px-4 py-3 sm:px-5 sm:py-4">
               <h2 className="font-display text-xl font-black text-white">Vòng bảng - {section.label}</h2>
