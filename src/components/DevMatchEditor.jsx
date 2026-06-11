@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronDown, RotateCcw, Save, Search } from 'lucide-react';
-import { getResultFromScores, parseVietnamDateTimeLocal, toVietnamDateTimeLocal } from '../lib/utils';
+import { getEffectiveMatchStatus, getResultFromScores, parseVietnamDateTimeLocal, toVietnamDateTimeLocal } from '../lib/utils';
 import { useDevelopMode } from '../context/DevelopModeContext';
 import { teamOptions } from '../lib/teamOptions';
 import { saveMatchAndSyncScores } from '../services/firestore';
@@ -20,7 +20,7 @@ function createDraftFromMatch(match) {
     homeLogo: match.homeLogo || '',
     awayLogo: match.awayLogo || '',
     matchTime: toVietnamDateTimeLocal(match.matchTime),
-    status: match.status || 'upcoming',
+    status: getEffectiveMatchStatus(match),
     homeScore: match.homeScore ?? '',
     awayScore: match.awayScore ?? ''
   };
@@ -151,7 +151,18 @@ export default function DevMatchEditor({ match }) {
 
   useEffect(() => {
     setDraft(createDraftFromMatch(match));
-  }, [match]);
+  }, [
+    match.awayCode,
+    match.awayLogo,
+    match.awayScore,
+    match.awayTeam,
+    match.homeCode,
+    match.homeLogo,
+    match.homeScore,
+    match.homeTeam,
+    match.matchTime,
+    match.status
+  ]);
 
   const hasChanges = useMemo(() => {
     const current = createDraftFromMatch(match);
@@ -160,6 +171,10 @@ export default function DevMatchEditor({ match }) {
 
   const handleSave = async () => {
     const payload = {
+      stage: match.stage || '',
+      round: match.round || '',
+      roundLabel: match.roundLabel || '',
+      group: match.group || '',
       homeTeam: draft.homeTeam,
       awayTeam: draft.awayTeam,
       homeCode: draft.homeCode.toUpperCase(),

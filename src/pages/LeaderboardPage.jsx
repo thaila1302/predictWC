@@ -3,12 +3,12 @@ import { ShieldAlert, UsersRound } from 'lucide-react';
 import SectionHeader from '../components/SectionHeader';
 import { listenLeaderboard } from '../services/firestore';
 
-function formatLostMoney(wrongPredictions) {
+function formatLostMoney(lostMoney) {
   return new Intl.NumberFormat('vi-VN', {
     style: 'currency',
     currency: 'VND',
     maximumFractionDigits: 0
-  }).format((wrongPredictions || 0) * 10000);
+  }).format(lostMoney || 0);
 }
 
 export default function LeaderboardPage() {
@@ -59,7 +59,7 @@ export default function LeaderboardPage() {
                     </span>
                   </td>
                   <td className="whitespace-nowrap px-4 py-4 text-right font-black text-rose-700 sm:px-5">
-                    {formatLostMoney(player.wrongPredictions)}
+                    {formatLostMoney(player.lostMoney)}
                   </td>
                 </tr>
               ))}

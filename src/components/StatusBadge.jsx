@@ -3,7 +3,7 @@ import { cn, getMatchStatusLabel } from '../lib/utils';
 const styles = {
   upcoming: 'bg-cyan-500/15 text-cyan-200 ring-cyan-400/30',
   live: 'bg-emerald-500/15 text-emerald-200 ring-emerald-400/30',
-  finished: 'bg-slate-200/10 text-slate-200 ring-slate-300/20'
+  finished: 'bg-slate-700 !text-white ring-slate-500/70 shadow-sm'
 };
 
 export default function StatusBadge({ status, spotlight = false }) {

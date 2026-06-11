@@ -57,8 +57,18 @@ export default function MatchCountdown({ startTime, status }) {
     };
   }, [now, startTime, status]);
 
+  if (status === 'live') {
+    return (
+      <div className="match-live-ball-track mt-4" role="img" aria-label="Bóng đang lăn">
+        <span className="match-live-ball" aria-hidden="true">
+          ⚽
+        </span>
+      </div>
+    );
+  }
+
   return (
-    <div className={`mt-4 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold ${content.tone}`}>
+    <div className={`mt-4 flex h-[1.875rem] w-fit items-center gap-2 rounded-full border px-3 text-xs font-semibold ${content.tone}`}>
       <TimerReset size={12} />
       {content.label}
     </div>

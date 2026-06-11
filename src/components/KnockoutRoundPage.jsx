@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Clock3, Lock } from 'lucide-react';
+import { Clock3 } from 'lucide-react';
 import StatusBadge from './StatusBadge';
 import PredictionButtons from './PredictionButtons';
 import PredictionConfirmDialog from './PredictionConfirmDialog';
@@ -7,8 +7,9 @@ import MatchCountdown from './MatchCountdown';
 import {
   formatDateTime,
   formatVietnamDay,
+  getEffectiveMatchStatus,
   getVietnamCalendarDayKey,
-  isMatchStarted,
+  hasMatchScore,
   isPredictionLocked,
   parseVietnamDateTimeLocal,
   toDate
@@ -113,27 +114,31 @@ function TeamBadge({ team, code, logo, align = 'left' }) {
   );
 }
 
-function MatchSeparatorIcon({ homeScore, awayScore }) {
-  const hasScore = homeScore !== null && homeScore !== undefined && awayScore !== null && awayScore !== undefined;
+function MatchSeparatorIcon({ match }) {
+  const hasScore = hasMatchScore(match);
 
   return (
     <div className="flex items-center justify-center rounded-full border border-white/10 bg-white/5 px-3 py-1.5 shadow-sm sm:px-4 sm:py-2">
-      <div className="flex items-center gap-2 text-slate-200">
-        <span className="text-xl font-black leading-none sm:text-2xl">{hasScore ? homeScore : '-'}</span>
-        <span className="text-xl font-black leading-none sm:text-2xl">:</span>
-        <span className="text-xl font-black leading-none sm:text-2xl">{hasScore ? awayScore : '-'}</span>
-      </div>
+      {match.status === 'finished' && !hasScore ? (
+        <span className="max-w-28 text-center text-[10px] font-bold leading-tight text-amber-200 sm:text-xs">
+          Đang chờ cập nhật tỉ số
+        </span>
+      ) : (
+        <div className="flex items-center gap-2 text-slate-200">
+          <span className="text-xl font-black leading-none sm:text-2xl">{hasScore ? match.homeScore : '-'}</span>
+          <span className="text-xl font-black leading-none sm:text-2xl">:</span>
+          <span className="text-xl font-black leading-none sm:text-2xl">{hasScore ? match.awayScore : '-'}</span>
+        </div>
+      )}
     </div>
   );
 }
 
 function MatchCard({ match, prediction, onPredict, saving, roundLabel, teamNameOverride }) {
   const { matchOverrides } = useDevelopMode();
-  const started = isMatchStarted(match.matchTime);
   const finished = match.status === 'finished';
   const locked = finished || isPredictionLocked(match.matchTime);
   const isSpotlightMatch = useMatchSpotlight(match.matchTime) && match.status !== 'finished';
-  const lockLabel = started ? 'Đã khóa' : 'Khóa trước 30 phút';
   const override = matchOverrides[match.id] || {};
   const homeTeamName = Object.prototype.hasOwnProperty.call(override, 'homeTeam')
     ? match.homeTeam
@@ -143,7 +148,7 @@ function MatchCard({ match, prediction, onPredict, saving, roundLabel, teamNameO
     : teamNameOverride || match.awayTeam;
 
   return (
-    <article className={`self-start overflow-hidden rounded-[1.25rem] border border-white/10 bg-slate-950/70 shadow-glow ring-1 ring-white/5 transition hover:border-white/20 ${isSpotlightMatch ? 'match-spotlight-card' : ''} ${finished ? 'finished-match-card' : ''}`}>
+    <article className={`flex h-full flex-col overflow-hidden rounded-[1.25rem] border border-white/10 bg-slate-950/70 shadow-glow ring-1 ring-white/5 transition hover:border-white/20 ${isSpotlightMatch ? 'match-spotlight-card' : ''} ${finished ? 'finished-match-card' : ''}`}>
       <div className="p-3 sm:p-4">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
@@ -161,7 +166,7 @@ function MatchCard({ match, prediction, onPredict, saving, roundLabel, teamNameO
           <TeamBadge team={homeTeamName} code={match.homeCode} logo={match.homeLogo} />
 
           <div className="mx-auto flex min-h-[58px] min-w-[74px] flex-col items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-2 py-2 text-center sm:min-h-[88px] sm:min-w-[128px] sm:px-4 sm:py-3">
-            <MatchSeparatorIcon homeScore={match.homeScore} awayScore={match.awayScore} />
+            <MatchSeparatorIcon match={match} />
           </div>
 
           <TeamBadge team={awayTeamName} code={match.awayCode} logo={match.awayLogo} align="right" />
@@ -169,17 +174,9 @@ function MatchCard({ match, prediction, onPredict, saving, roundLabel, teamNameO
 
         <MatchCountdown startTime={match.matchTime} status={match.status || 'upcoming'} />
 
-        {locked ? (
-          <div className="mt-4 flex justify-end text-xs text-slate-300">
-            <span className="inline-flex items-center gap-2 rounded-full bg-rose-500/15 px-3 py-1 text-rose-200">
-              <Lock size={12} />
-              {lockLabel}
-            </span>
-          </div>
-        ) : null}
       </div>
 
-      <div className="border-t border-white/10 bg-white/5 p-3 pt-3 sm:p-4">
+      <div className="mt-auto border-t border-white/10 bg-white/5 p-3 pt-3 sm:p-4">
         <PredictionButtons
           value={prediction?.predictedResult}
           disabled={locked || saving}
@@ -230,7 +227,10 @@ export default function KnockoutRoundPage({
   }, [user?.uid]);
 
   const predictionMap = useMemo(() => new Map(predictions.map((item) => [item.matchId, item])), [predictions]);
-  const displayMatches = useMemo(() => applyMatchOverrides(matches), [applyMatchOverrides, matches]);
+  const displayMatches = useMemo(
+    () => applyMatchOverrides(matches).map((match) => ({ ...match, status: getEffectiveMatchStatus(match, now) })),
+    [applyMatchOverrides, matches, now]
+  );
   const sections = useMemo(() => groupMatchesByNearestDay(displayMatches, now), [displayMatches, now]);
 
   const handlePredict = (match, value, labels) => {
@@ -285,7 +285,7 @@ export default function KnockoutRoundPage({
               </h2>
             </div>
 
-            <div className="grid items-start gap-3 p-3 sm:gap-4 sm:p-4 md:grid-cols-2">
+            <div className="grid items-stretch gap-3 p-3 sm:gap-4 sm:p-4 md:grid-cols-2">
               {section.matches.map((match) => {
                 const prediction = predictionMap.get(match.id);
                 const isSingleMatchSection = section.matches.length === 1;

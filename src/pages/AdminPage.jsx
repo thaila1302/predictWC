@@ -7,6 +7,7 @@ import {
   formatDateTime,
   formatVietnamDay,
   formatVietnamDayKey,
+  getEffectiveMatchStatus,
   parseVietnamDateTimeLocal,
   toDate
 } from '../lib/utils';
@@ -22,6 +23,7 @@ import seedQuarterFinals from '../../data/quarter-finals.json';
 import seedSemiFinals from '../../data/semi-finals.json';
 import seedThirdPlace from '../../data/third-place.json';
 import seedFinal from '../../data/final.json';
+import useCurrentTime from '../hooks/useCurrentTime';
 
 const PRIMARY_ADMIN_NAME = 'Lê Anh Thái';
 
@@ -692,6 +694,7 @@ export default function AdminPage() {
   const [users, setUsers] = useState([]);
   const [predictions, setPredictions] = useState([]);
   const { applyMatchOverrides } = useDevelopMode();
+  const now = useCurrentTime();
   const { user: currentUser } = useAuth();
 
   useEffect(() => {
@@ -705,7 +708,10 @@ export default function AdminPage() {
   useEffect(() => listenLeaderboard(setUsers), []);
   useEffect(() => listenAllPredictions(setPredictions), []);
 
-  const displayMatches = useMemo(() => applyMatchOverrides(matches), [applyMatchOverrides, matches]);
+  const displayMatches = useMemo(
+    () => applyMatchOverrides(matches).map((match) => ({ ...match, status: getEffectiveMatchStatus(match, now) })),
+    [applyMatchOverrides, matches, now]
+  );
   const matchRoundOptions = useMemo(() => getMatchRoundOptions(displayMatches), [displayMatches]);
 
   const sortedUsers = useMemo(() => {

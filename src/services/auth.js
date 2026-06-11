@@ -76,6 +76,7 @@ async function upsertUserAccount(account, preserveTimestamps = true) {
       email: account.email || '',
       photoURL: account.photoURL || '',
       wrongPredictions: account.wrongPredictions || 0,
+      lostMoney: account.lostMoney || 0,
       isAdmin: Boolean(account.isAdmin),
       isLocked: Boolean(account.isLocked),
       updatedAt: serverTimestamp(),
@@ -114,6 +115,7 @@ export async function migrateLegacyLocalAccountsToFirestore() {
           usernameLower: normalizeUsername(username),
           passwordHash,
           wrongPredictions: account?.wrongPredictions || 0,
+          lostMoney: account?.lostMoney || 0,
           isAdmin: isPrimaryAdminDisplayName(displayName) ? true : Boolean(account?.isAdmin),
           isLocked: isPrimaryAdminDisplayName(displayName) ? false : Boolean(account?.isLocked),
           createdAt: account?.createdAt || serverTimestamp()
@@ -210,6 +212,7 @@ export async function registerWithUsername({ displayName, email, username, passw
     usernameLower: normalizeUsername(trimmedUsername),
     passwordHash,
     wrongPredictions: 0,
+    lostMoney: 0,
     isAdmin: isPrimaryAdminDisplayName(trimmedDisplayName),
     isLocked: false,
     createdAt: serverTimestamp()

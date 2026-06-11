@@ -11,7 +11,20 @@ import {
   where
 } from 'firebase/firestore';
 import { db } from '../firebase';
-import { getMatchSortTime, getResultFromScores } from '../lib/utils';
+import { getMatchSortTime, getResultFromScores, toDate } from '../lib/utils';
+import { DEFAULT_STAKE, getMatchStake } from '../lib/stakes';
+
+const PREDICTION_LOCK_OFFSET_MS = 30 * 60 * 1000;
+
+function wasUserEligibleToPredict(user, match) {
+  const createdAt = toDate(user.createdAt);
+  const matchTime = getMatchSortTime(match);
+
+  // Preserve existing behavior for legacy users or matches without timestamps.
+  if (!createdAt || Number.isNaN(createdAt.getTime()) || !matchTime) return true;
+
+  return createdAt.getTime() <= matchTime - PREDICTION_LOCK_OFFSET_MS;
+}
 
 export function listenMatches(callback) {
   const q = query(collection(db, 'matches'), orderBy('matchTime', 'asc'));
@@ -35,7 +48,10 @@ export function listenLeaderboard(callback) {
   return onSnapshot(q, (snapshot) => {
     const players = snapshot.docs
       .map((item) => ({ id: item.id, ...item.data() }))
+      .filter((player) => player.displayName || player.username || player.email)
       .sort((left, right) => {
+        const lostMoneyDiff = (right.lostMoney || 0) - (left.lostMoney || 0);
+        if (lostMoneyDiff !== 0) return lostMoneyDiff;
         const wrongDiff = (right.wrongPredictions || 0) - (left.wrongPredictions || 0);
         if (wrongDiff !== 0) return wrongDiff;
         return String(left.displayName || left.username || '').localeCompare(
@@ -80,6 +96,7 @@ export async function saveMatchAndSyncScores(matchId, payload) {
   const matchRef = doc(db, 'matches', matchId);
   const computedWinner =
     payload.status === 'finished' ? getResultFromScores(payload.homeScore, payload.awayScore) : null;
+  const matchStake = getMatchStake(payload);
 
   await setDoc(
     matchRef,
@@ -93,35 +110,58 @@ export async function saveMatchAndSyncScores(matchId, payload) {
 
   const predictionsSnapshot = await getDocs(query(collection(db, 'predictions'), where('matchId', '==', matchId)));
   const usersSnapshot = await getDocs(collection(db, 'users'));
-  const affectedUserIds = new Set(usersSnapshot.docs.map((userDoc) => userDoc.id));
+  const matchesSnapshot = await getDocs(collection(db, 'matches'));
+  const usersById = new Map(usersSnapshot.docs.map((userDoc) => [userDoc.id, userDoc.data()]));
+  const matchesById = new Map(matchesSnapshot.docs.map((matchDoc) => [matchDoc.id, matchDoc.data()]));
+  const existingUserIds = new Set(usersSnapshot.docs.map((userDoc) => userDoc.id));
+  const affectedUserIds = new Set(existingUserIds);
   const predictedUserIds = new Set();
   const batch = writeBatch(db);
 
   predictionsSnapshot.docs.forEach((predictionDoc) => {
     const prediction = predictionDoc.data();
+
+    if (!existingUserIds.has(prediction.userId)) {
+      batch.delete(predictionDoc.ref);
+      return;
+    }
+
+    const isFinished = Boolean(computedWinner) && payload.status === 'finished';
+    const isInvalidMissedPrediction =
+      isFinished && prediction.autoMissed && !wasUserEligibleToPredict(usersById.get(prediction.userId) || {}, payload);
+
+    if (isInvalidMissedPrediction) {
+      batch.delete(predictionDoc.ref);
+      return;
+    }
+
     predictedUserIds.add(prediction.userId);
     const nextResultStatus =
-      computedWinner && payload.status === 'finished'
+      isFinished
         ? prediction.predictedResult === computedWinner
           ? 'not_wrong'
           : 'wrong'
         : 'pending';
+    const lostAmount = nextResultStatus === 'wrong' ? matchStake : 0;
     batch.set(
       predictionDoc.ref,
       {
         resultStatus: nextResultStatus,
+        lostAmount,
         updatedAt: serverTimestamp()
       },
       { merge: true }
     );
 
-    affectedUserIds.add(prediction.userId);
+    if (existingUserIds.has(prediction.userId)) {
+      affectedUserIds.add(prediction.userId);
+    }
   });
 
   if (computedWinner && payload.status === 'finished') {
     usersSnapshot.docs.forEach((userDoc) => {
       const userId = userDoc.id;
-      if (predictedUserIds.has(userId)) return;
+      if (predictedUserIds.has(userId) || !wasUserEligibleToPredict(userDoc.data(), payload)) return;
 
       const missedPredictionRef = doc(db, 'predictions', `${userId}_${matchId}`);
       batch.set(
@@ -131,6 +171,7 @@ export async function saveMatchAndSyncScores(matchId, payload) {
           matchId,
           predictedResult: null,
           resultStatus: 'wrong',
+          lostAmount: matchStake,
           autoMissed: true,
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp()
@@ -146,11 +187,13 @@ export async function saveMatchAndSyncScores(matchId, payload) {
     const targetRef = doc(db, 'users', userId);
     const predictionsByUserSnapshot = await getDocs(query(collection(db, 'predictions'), where('userId', '==', userId)));
     let wrongPredictions = 0;
+    let lostMoney = 0;
 
     predictionsByUserSnapshot.docs.forEach((predictionDoc) => {
       const prediction = predictionDoc.data();
       if (prediction.resultStatus === 'wrong') {
         wrongPredictions += 1;
+        lostMoney += Number(prediction.lostAmount) || getMatchStake(matchesById.get(prediction.matchId)) || DEFAULT_STAKE;
       }
     });
 
@@ -159,6 +202,7 @@ export async function saveMatchAndSyncScores(matchId, payload) {
       {
         uid: userId,
         wrongPredictions,
+        lostMoney,
         updatedAt: serverTimestamp()
       },
       { merge: true }

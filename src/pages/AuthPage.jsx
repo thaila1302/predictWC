@@ -208,7 +208,7 @@ export default function AuthPage() {
           </div>
 
           {error ? (
-            <div className="mb-4 rounded-2xl border border-rose-400/20 bg-rose-400/10 px-4 py-3 text-sm text-rose-100">
+            <div className="mb-4 rounded-2xl border border-rose-300 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700 shadow-sm ring-1 ring-rose-200/70">
               {error}
             </div>
           ) : null}

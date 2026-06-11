@@ -1,5 +1,6 @@
 const VIETNAM_TIME_ZONE = 'Asia/Ho_Chi_Minh';
 const VIETNAM_OFFSET_MS = 7 * 60 * 60 * 1000;
+const MATCH_DURATION_MS = 110 * 60 * 1000;
 
 export function cn(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -90,6 +91,29 @@ export function getMatchStatusLabel(status) {
     default:
       return 'Sắp diễn ra';
   }
+}
+
+export function hasMatchScore(match) {
+  return (
+    match?.homeScore !== null &&
+    match?.homeScore !== undefined &&
+    match?.awayScore !== null &&
+    match?.awayScore !== undefined
+  );
+}
+
+export function getEffectiveMatchStatus(match, now = Date.now()) {
+  if (match?.status === 'finished') return 'finished';
+
+  const matchDate = toDate(match?.matchTime || match?.startTime);
+  if (!matchDate || Number.isNaN(matchDate.getTime())) {
+    return match?.status || 'upcoming';
+  }
+
+  const elapsedMs = now - matchDate.getTime();
+  if (elapsedMs >= MATCH_DURATION_MS) return 'finished';
+  if (elapsedMs >= 0) return 'live';
+  return 'upcoming';
 }
 
 export function getResultFromScores(homeScore, awayScore) {
