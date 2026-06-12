@@ -7,6 +7,7 @@ export default async function handler(request, response) {
 
   try {
     const identifier = normalizeIdentifier(request.body?.identifier);
+    const unitId = String(request.body?.unitId || 'default');
     const code = String(request.body?.code || '').trim();
     const newPassword = String(request.body?.newPassword || '');
 
@@ -15,7 +16,7 @@ export default async function handler(request, response) {
       return;
     }
 
-    const user = await findUserByIdentifier(identifier);
+    const user = await findUserByIdentifier(identifier, unitId);
     if (!user?.uid) {
       sendJson(response, 400, { success: false, error: 'Ma xac nhan khong dung.' });
       return;
@@ -29,7 +30,12 @@ export default async function handler(request, response) {
     }
 
     const reset = resetSnapshot.data();
-    if (reset.used || reset.code !== code || Number(reset.expiresAt || 0) < Date.now()) {
+    if (
+      reset.used ||
+      (reset.unitId || 'default') !== unitId ||
+      reset.code !== code ||
+      Number(reset.expiresAt || 0) < Date.now()
+    ) {
       sendJson(response, 400, { success: false, error: 'Ma xac nhan khong dung hoac da het han.' });
       return;
     }

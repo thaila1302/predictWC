@@ -9,12 +9,13 @@ export default async function handler(request, response) {
 
   try {
     const identifier = normalizeIdentifier(request.body?.identifier);
+    const unitId = String(request.body?.unitId || 'default');
     if (!identifier) {
       sendJson(response, 400, { success: false, error: 'Vui lòng nhập email hoặc tài khoản.' });
       return;
     }
 
-    const user = await findUserByIdentifier(identifier);
+    const user = await findUserByIdentifier(identifier, unitId);
     if (!user?.uid) {
       sendJson(response, 404, { success: false, error: 'Không tìm thấy tài khoản hoặc email này.' });
       return;
@@ -31,6 +32,7 @@ export default async function handler(request, response) {
       {
         userId: user.uid,
         email: user.email,
+        unitId,
         code,
         expiresAt: Date.now() + RESET_TTL_MS,
         used: false,

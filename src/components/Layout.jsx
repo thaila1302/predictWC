@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useAuth } from '../context/AuthContext';
+import { useUnit } from '../context/UnitContext';
 
 const navItems = [
   { to: '/matches', label: 'Vòng Bảng', icon: ListChecks },
@@ -109,6 +110,7 @@ function RenameDialog({ open, currentName, saving, error, onClose, onSave }) {
 
 export default function Layout() {
   const { user, logout, updateDisplayName } = useAuth();
+  const { pathFor } = useUnit();
   const [renameOpen, setRenameOpen] = useState(false);
   const [renameSaving, setRenameSaving] = useState(false);
   const [renameError, setRenameError] = useState('');
@@ -133,7 +135,7 @@ export default function Layout() {
       <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/85 backdrop-blur-xl">
         <div className="mx-auto max-w-[108rem] px-3 py-3 sm:px-6 sm:py-4 lg:px-8">
           <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-4">
-            <Link to="/matches" className="flex min-w-0 items-center gap-3">
+            <Link to={pathFor('/matches')} className="flex min-w-0 items-center gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-400 via-fuchsia-500 to-cyan-400 text-slate-950 shadow-glow sm:h-11 sm:w-11">
                 <Trophy size={20} strokeWidth={2.5} />
               </div>
@@ -180,7 +182,7 @@ export default function Layout() {
                 return (
                   <NavLink
                     key={item.to}
-                    to={item.to}
+                    to={pathFor(item.to)}
                     className={({ isActive }) =>
                       cn(
                         'inline-flex items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-xs font-semibold whitespace-nowrap transition sm:gap-2 sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm lg:flex-1',

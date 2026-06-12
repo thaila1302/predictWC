@@ -6,31 +6,43 @@ import {
   subscribeAccountByUid,
   updateUserDisplayName
 } from '../services/auth';
+import { DEFAULT_UNIT_ID, SECONDARY_UNIT_ID, useUnit } from './UnitContext';
+import { setActiveUnit } from '../components/UnitAccessRedirect';
 
-const AUTH_SESSION_KEY = 'predictwc_auth_uid';
+const AUTH_SESSION_KEY_PREFIX = 'predictwc_auth_uid';
 
 const AuthContext = createContext(null);
 
-function readStoredUid() {
+function readStoredUid(unitId) {
   if (typeof window === 'undefined') return '';
 
   try {
-    return window.sessionStorage.getItem(AUTH_SESSION_KEY) || '';
+    const unitSession = window.sessionStorage.getItem(`${AUTH_SESSION_KEY_PREFIX}_${unitId}`) || '';
+    if (unitSession || unitId !== 'default') return unitSession;
+
+    return window.sessionStorage.getItem(AUTH_SESSION_KEY_PREFIX) || '';
   } catch {
     return '';
   }
 }
 
 export function AuthProvider({ children }) {
+  const { unitId } = useUnit();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [bootstrapping, setBootstrapping] = useState(true);
-  const [sessionUid, setSessionUid] = useState(() => readStoredUid());
+  const [sessionUid, setSessionUid] = useState(() => readStoredUid(unitId));
+
+  useEffect(() => {
+    setUser(null);
+    setSessionUid(readStoredUid(unitId));
+  }, [unitId]);
 
   useEffect(() => {
     let active = true;
+    setBootstrapping(true);
 
-    migrateLegacyLocalAccountsToFirestore()
+    migrateLegacyLocalAccountsToFirestore(unitId)
       .catch(() => {})
       .finally(() => {
         if (active) {
@@ -41,20 +53,23 @@ export function AuthProvider({ children }) {
     return () => {
       active = false;
     };
-  }, []);
+  }, [unitId]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
     try {
       if (sessionUid) {
-        window.sessionStorage.setItem(AUTH_SESSION_KEY, sessionUid);
+        window.sessionStorage.setItem(`${AUTH_SESSION_KEY_PREFIX}_${unitId}`, sessionUid);
+        if (unitId === 'default') {
+          window.sessionStorage.removeItem(AUTH_SESSION_KEY_PREFIX);
+        }
       } else {
-        window.sessionStorage.removeItem(AUTH_SESSION_KEY);
+        window.sessionStorage.removeItem(`${AUTH_SESSION_KEY_PREFIX}_${unitId}`);
       }
     } catch {
     }
-  }, [sessionUid]);
+  }, [sessionUid, unitId]);
 
   useEffect(() => {
     if (!sessionUid) {
@@ -69,6 +84,29 @@ export function AuthProvider({ children }) {
         return;
       }
 
+      if (nextAccount.unitId !== unitId) {
+        setActiveUnit(nextAccount.unitId);
+        setUser(null);
+
+        if (typeof window !== 'undefined') {
+          try {
+            window.sessionStorage.setItem(`${AUTH_SESSION_KEY_PREFIX}_${nextAccount.unitId}`, sessionUid);
+            window.sessionStorage.removeItem(`${AUTH_SESSION_KEY_PREFIX}_${unitId}`);
+          } catch {
+          }
+
+          const currentPath = window.location.pathname;
+          const nextPath =
+            nextAccount.unitId === SECONDARY_UNIT_ID
+              ? currentPath === '/'
+                ? `/${SECONDARY_UNIT_ID}`
+                : `/${SECONDARY_UNIT_ID}${currentPath}`
+              : currentPath.replace(new RegExp(`^/${SECONDARY_UNIT_ID}(?=/|$)`), '') || '/';
+          window.location.replace(`${nextPath}${window.location.search}${window.location.hash}`);
+        }
+        return;
+      }
+
       setUser({
         uid: nextAccount.uid,
         displayName: nextAccount.displayName,
@@ -78,12 +116,13 @@ export function AuthProvider({ children }) {
         isLocked: Boolean(nextAccount.isLocked)
       });
     });
-  }, [sessionUid]);
+  }, [sessionUid, unitId]);
 
   const login = async (payload) => {
     setLoading(true);
     try {
-      const nextUser = await loginWithUsername(payload);
+      const nextUser = await loginWithUsername({ ...payload, unitId });
+      setActiveUnit(nextUser.unitId);
       setUser(nextUser);
       setSessionUid(nextUser.uid);
       return nextUser;
@@ -95,7 +134,8 @@ export function AuthProvider({ children }) {
   const register = async (payload) => {
     setLoading(true);
     try {
-      const nextUser = await registerWithUsername(payload);
+      const nextUser = await registerWithUsername({ ...payload, unitId });
+      setActiveUnit(nextUser.unitId);
       setUser(nextUser);
       setSessionUid(nextUser.uid);
       return nextUser;
@@ -105,6 +145,7 @@ export function AuthProvider({ children }) {
   };
 
   const logout = () => {
+    setActiveUnit(DEFAULT_UNIT_ID);
     setUser(null);
     setSessionUid('');
   };

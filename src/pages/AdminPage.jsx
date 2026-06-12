@@ -12,7 +12,7 @@ import {
   toDate
 } from '../lib/utils';
 import { listenAllPredictions, listenLeaderboard, listenMatches } from '../services/firestore';
-import { updateUserAccess } from '../services/auth';
+import { updateUserAccess, updateUserUnit } from '../services/auth';
 import { useDevelopMode } from '../context/DevelopModeContext';
 import { useAuth } from '../context/AuthContext';
 import { mergeMatchesById } from '../lib/matchMerge';
@@ -24,6 +24,7 @@ import seedSemiFinals from '../../data/semi-finals.json';
 import seedThirdPlace from '../../data/third-place.json';
 import seedFinal from '../../data/final.json';
 import useCurrentTime from '../hooks/useCurrentTime';
+import { DEFAULT_UNIT_ID, SECONDARY_UNIT_ID, useUnit } from '../context/UnitContext';
 
 const PRIMARY_ADMIN_NAME = 'Lê Anh Thái';
 
@@ -315,16 +316,20 @@ function MatchesTab({ matches, roundFilter }) {
   );
 }
 
-function UsersTab({ users, predictionCountByUser, currentUserId, onToggleAdmin, onToggleLocked }) {
+function UsersTab({ users, predictionCountByUser, currentUserId, onToggleAdmin, onToggleLocked, onChangeUnit }) {
   const [query, setQuery] = useState('');
   const [savingUserId, setSavingUserId] = useState('');
+  const [actionError, setActionError] = useState('');
 
   const filteredUsers = useMemo(() => {
     const keyword = query.trim().toLowerCase();
     if (!keyword) return users;
 
     return users.filter((user) => {
-      const haystack = [user.displayName, user.email, user.username, user.uid || user.id].filter(Boolean).join(' ').toLowerCase();
+      const haystack = [user.displayName, user.email, user.username, user.unitId || DEFAULT_UNIT_ID, user.uid || user.id]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase();
       return haystack.includes(keyword);
     });
   }, [query, users]);
@@ -349,6 +354,19 @@ function UsersTab({ users, predictionCountByUser, currentUserId, onToggleAdmin, 
     }
   };
 
+  const handleChangeUnit = async (user, unitId) => {
+    const userId = user.uid || user.id;
+    setActionError('');
+    setSavingUserId(userId);
+    try {
+      await onChangeUnit(user, unitId);
+    } catch (error) {
+      setActionError(error.message || 'Không thể chuyển đơn vị cho người dùng.');
+    } finally {
+      setSavingUserId('');
+    }
+  };
+
   return (
     <div className="space-y-5">
       <div className="grid gap-4 md:grid-cols-3">
@@ -367,6 +385,12 @@ function UsersTab({ users, predictionCountByUser, currentUserId, onToggleAdmin, 
 
       <SearchInput value={query} onChange={setQuery} placeholder="Tìm theo họ tên, email, tài khoản hoặc UID" />
 
+      {actionError ? (
+        <div className="rounded-2xl border border-rose-400/30 bg-rose-500/10 px-4 py-3 text-sm font-semibold text-rose-200">
+          {actionError}
+        </div>
+      ) : null}
+
       {filteredUsers.length === 0 ? (
         <EmptyState title="Chưa có người dùng phù hợp" description="Thử lại với từ khóa khác hoặc tạo thêm tài khoản để kiểm tra." />
       ) : (
@@ -380,6 +404,7 @@ function UsersTab({ users, predictionCountByUser, currentUserId, onToggleAdmin, 
                   <th className="px-4 py-4 font-semibold">Tài khoản</th>
                   <th className="px-4 py-4 font-semibold">D? ?o?n sai</th>
                   <th className="px-4 py-4 font-semibold">Kèo</th>
+                  <th className="px-4 py-4 font-semibold">Đơn vị</th>
                   <th className="px-4 py-4 font-semibold">Quản trị</th>
                   <th className="px-4 py-4 font-semibold">Khóa</th>
                   <th className="px-4 py-4 font-semibold">UID</th>
@@ -404,6 +429,17 @@ function UsersTab({ users, predictionCountByUser, currentUserId, onToggleAdmin, 
                       <td className="px-4 py-4 text-slate-200">@{user.username || 'chưa-có-tài-khoản'}</td>
                       <td className="px-4 py-4 font-bold text-rose-200">{user.wrongPredictions || 0}</td>
                       <td className="px-4 py-4 text-slate-200">{predictionCount}</td>
+                      <td className="px-4 py-4">
+                        <select
+                          value={user.unitId || DEFAULT_UNIT_ID}
+                          onChange={(event) => handleChangeUnit(user, event.target.value)}
+                          disabled={saving || userId === currentUserId}
+                          className="min-w-[110px] rounded-xl border border-white/10 bg-slate-950/70 px-3 py-2 text-sm font-semibold text-white outline-none transition focus:border-cyan-400/50 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          <option value={DEFAULT_UNIT_ID}>{DEFAULT_UNIT_ID}</option>
+                          <option value={SECONDARY_UNIT_ID}>{SECONDARY_UNIT_ID}</option>
+                        </select>
+                      </td>
                       <td className="px-4 py-4">
                         <TogglePill
                           enabled={Boolean(user.isAdmin)}
@@ -696,6 +732,7 @@ export default function AdminPage() {
   const { applyMatchOverrides } = useDevelopMode();
   const now = useCurrentTime();
   const { user: currentUser } = useAuth();
+  const { unitId } = useUnit();
 
   useEffect(() => {
     return listenMatches((remoteMatches) => {
@@ -705,8 +742,10 @@ export default function AdminPage() {
     });
   }, []);
 
-  useEffect(() => listenLeaderboard(setUsers), []);
-  useEffect(() => listenAllPredictions(setPredictions), []);
+  const isPrimaryAdmin = currentUser?.displayName === PRIMARY_ADMIN_NAME;
+
+  useEffect(() => listenLeaderboard(unitId, setUsers, isPrimaryAdmin), [isPrimaryAdmin, unitId]);
+  useEffect(() => listenAllPredictions(unitId, setPredictions, isPrimaryAdmin), [isPrimaryAdmin, unitId]);
 
   const displayMatches = useMemo(
     () => applyMatchOverrides(matches).map((match) => ({ ...match, status: getEffectiveMatchStatus(match, now) })),
@@ -740,6 +779,10 @@ export default function AdminPage() {
     await updateUserAccess(targetUser.uid || targetUser.id, {
       isLocked: !targetUser.isLocked
     });
+  };
+
+  const handleChangeUnit = async (targetUser, nextUnitId) => {
+    await updateUserUnit(targetUser.uid || targetUser.id, nextUnitId);
   };
 
   return (
@@ -789,6 +832,7 @@ export default function AdminPage() {
           currentUserId={currentUser?.uid}
           onToggleAdmin={handleToggleAdmin}
           onToggleLocked={handleToggleLocked}
+          onChangeUnit={handleChangeUnit}
         />
       ) : null}
 

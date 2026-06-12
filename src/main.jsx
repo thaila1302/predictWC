@@ -5,12 +5,18 @@ import App from './App';
 import './index.css';
 import FirebaseSetupNotice from './components/FirebaseSetupNotice';
 import { firebaseConfigured } from './firebase';
+import { UnitProvider } from './context/UnitContext';
+import UnitAccessRedirect from './components/UnitAccessRedirect';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     {firebaseConfigured ? (
       <BrowserRouter>
-        <App />
+        <UnitAccessRedirect>
+          <UnitProvider>
+            <App />
+          </UnitProvider>
+        </UnitAccessRedirect>
       </BrowserRouter>
     ) : (
       <FirebaseSetupNotice />

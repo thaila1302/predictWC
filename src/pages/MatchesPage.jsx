@@ -20,6 +20,7 @@ import { mergeMatchesById } from '../lib/matchMerge';
 import useMatchSpotlight from '../hooks/useMatchSpotlight';
 import useCurrentTime from '../hooks/useCurrentTime';
 import seedMatches from '../../data/matches.json';
+import { useUnit } from '../context/UnitContext';
 
 function formatDayKey(value) {
   return getVietnamCalendarDayKey(value);
@@ -156,6 +157,7 @@ export default function MatchesPage() {
   const [pendingPrediction, setPendingPrediction] = useState(null);
   const { applyMatchOverrides } = useDevelopMode();
   const { user } = useAuth();
+  const { unitId } = useUnit();
   const now = useCurrentTime();
 
   useEffect(() => {
@@ -171,8 +173,8 @@ export default function MatchesPage() {
       return undefined;
     }
 
-    return listenUserPredictions(user.uid, setPredictions);
-  }, [user?.uid]);
+    return listenUserPredictions(user.uid, unitId, setPredictions);
+  }, [unitId, user?.uid]);
 
   const predictionMap = useMemo(() => new Map(predictions.map((item) => [item.matchId, item])), [predictions]);
   const displayMatches = useMemo(
@@ -204,6 +206,7 @@ export default function MatchesPage() {
       await savePrediction({
         userId: user.uid,
         matchId: match.id,
+        unitId,
         predictedResult: value
       });
       setPendingPrediction(null);

@@ -1,17 +1,19 @@
 import {
   collection,
   doc,
+  getDoc,
   getDocs,
-  limit,
   onSnapshot,
   query,
   serverTimestamp,
   setDoc,
   updateDoc,
-  where
+  where,
+  writeBatch
 } from 'firebase/firestore';
 import { db } from '../firebase';
 import { hashPassword } from '../lib/password';
+import { DEFAULT_UNIT_ID, SECONDARY_UNIT_ID } from '../context/UnitContext';
 
 const LEGACY_LOCAL_ACCOUNTS_KEY = 'predictwc_local_accounts';
 const LEGACY_AUTH_SESSION_KEY = 'predictwc_auth_session';
@@ -41,25 +43,35 @@ function isPrimaryAdminDisplayName(displayName) {
   return String(displayName || '').trim() === PRIMARY_ADMIN_NAME;
 }
 
+function getAccountUnitId(account) {
+  return account?.unitId || DEFAULT_UNIT_ID;
+}
+
 function toSessionUser(account) {
   return {
     uid: account.uid,
     displayName: account.displayName,
     username: account.username,
     email: account.email || '',
+    unitId: getAccountUnitId(account),
     isAdmin: Boolean(account.isAdmin),
     isLocked: Boolean(account.isLocked)
   };
 }
 
-async function findAccountByUsername(username) {
+async function findAccountByUsername(username, unitId) {
   const usernameLower = normalizeUsername(username);
-  const q = query(collection(db, 'users'), where('usernameLower', '==', usernameLower), limit(1));
+  const q = query(collection(db, 'users'), where('usernameLower', '==', usernameLower));
   const snapshot = await getDocs(q);
-  if (snapshot.empty) return null;
+  const item = snapshot.docs.find((candidate) => getAccountUnitId(candidate.data()) === unitId);
+  if (!item) return null;
 
-  const item = snapshot.docs[0];
   return { id: item.id, ...item.data() };
+}
+
+async function hasAccountsInUnit(unitId) {
+  const snapshot = await getDocs(collection(db, 'users'));
+  return snapshot.docs.some((item) => getAccountUnitId(item.data()) === unitId);
 }
 
 async function upsertUserAccount(account, preserveTimestamps = true) {
@@ -74,6 +86,7 @@ async function upsertUserAccount(account, preserveTimestamps = true) {
       usernameLower: normalizeUsername(account.username),
       passwordHash: account.passwordHash,
       email: account.email || '',
+      unitId: getAccountUnitId(account),
       photoURL: account.photoURL || '',
       wrongPredictions: account.wrongPredictions || 0,
       lostMoney: account.lostMoney || 0,
@@ -86,8 +99,8 @@ async function upsertUserAccount(account, preserveTimestamps = true) {
   );
 }
 
-export async function migrateLegacyLocalAccountsToFirestore() {
-  if (typeof window === 'undefined' || !db) return;
+export async function migrateLegacyLocalAccountsToFirestore(unitId = DEFAULT_UNIT_ID) {
+  if (typeof window === 'undefined' || !db || unitId !== DEFAULT_UNIT_ID) return;
 
   try {
     const raw = window.localStorage.getItem(LEGACY_LOCAL_ACCOUNTS_KEY);
@@ -103,7 +116,7 @@ export async function migrateLegacyLocalAccountsToFirestore() {
       const passwordHash = String(account?.passwordHash || '');
       if (!displayName || !username || !passwordHash) continue;
 
-      const existing = await findAccountByUsername(username);
+      const existing = await findAccountByUsername(username, unitId);
       if (existing) continue;
 
       const uid = account?.uid || createUid();
@@ -114,6 +127,7 @@ export async function migrateLegacyLocalAccountsToFirestore() {
           username,
           usernameLower: normalizeUsername(username),
           passwordHash,
+          unitId,
           wrongPredictions: account?.wrongPredictions || 0,
           lostMoney: account?.lostMoney || 0,
           isAdmin: isPrimaryAdminDisplayName(displayName) ? true : Boolean(account?.isAdmin),
@@ -139,7 +153,7 @@ export function subscribeAccountByUid(uid, callback) {
       return;
     }
 
-    callback({ id: snapshot.id, ...snapshot.data() });
+    callback({ id: snapshot.id, ...snapshot.data(), unitId: getAccountUnitId(snapshot.data()) });
   });
 }
 
@@ -149,6 +163,55 @@ export async function updateUserAccess(uid, updates) {
     ...updates,
     updatedAt: serverTimestamp()
   });
+}
+
+export async function updateUserUnit(uid, unitId) {
+  if (!uid) {
+    throw new Error('Không tìm thấy tài khoản.');
+  }
+
+  if (![DEFAULT_UNIT_ID, SECONDARY_UNIT_ID].includes(unitId)) {
+    throw new Error('Đơn vị không hợp lệ.');
+  }
+
+  const userRef = doc(db, 'users', uid);
+  const userSnapshot = await getDoc(userRef);
+  if (!userSnapshot.exists()) {
+    throw new Error('Không tìm thấy tài khoản.');
+  }
+
+  const user = userSnapshot.data();
+  if (getAccountUnitId(user) === unitId) return;
+
+  const matchingUsernameSnapshot = await getDocs(
+    query(collection(db, 'users'), where('usernameLower', '==', normalizeUsername(user.username)))
+  );
+  const hasUsernameConflict = matchingUsernameSnapshot.docs.some(
+    (item) => item.id !== uid && getAccountUnitId(item.data()) === unitId
+  );
+  if (hasUsernameConflict) {
+    throw new Error('Đơn vị đích đã có tài khoản sử dụng username này.');
+  }
+
+  const predictionsSnapshot = await getDocs(query(collection(db, 'predictions'), where('userId', '==', uid)));
+  const writes = [
+    {
+      ref: userRef,
+      data: { unitId, updatedAt: serverTimestamp() }
+    },
+    ...predictionsSnapshot.docs.map((predictionDoc) => ({
+      ref: predictionDoc.ref,
+      data: { unitId, updatedAt: serverTimestamp() }
+    }))
+  ];
+
+  for (let index = 0; index < writes.length; index += 450) {
+    const batch = writeBatch(db);
+    writes.slice(index, index + 450).forEach(({ ref, data }) => {
+      batch.set(ref, data, { merge: true });
+    });
+    await batch.commit();
+  }
 }
 
 export async function updateUserDisplayName(uid, displayName) {
@@ -172,7 +235,7 @@ export async function updateUserDisplayName(uid, displayName) {
   });
 }
 
-export async function registerWithUsername({ displayName, email, username, password }) {
+export async function registerWithUsername({ displayName, email, username, password, unitId = DEFAULT_UNIT_ID }) {
   const trimmedDisplayName = String(displayName || '').trim();
   const normalizedEmail = normalizeEmail(email);
   const trimmedUsername = String(username || '').trim();
@@ -197,13 +260,14 @@ export async function registerWithUsername({ displayName, email, username, passw
     throw new Error('Vui long nhap mat khau.');
   }
 
-  const existingAccount = await findAccountByUsername(trimmedUsername);
+  const existingAccount = await findAccountByUsername(trimmedUsername, unitId);
   if (existingAccount) {
     throw new Error('Tai khoan da ton tai.');
   }
 
   const uid = createUid();
   const passwordHash = await hashPassword(password);
+  const isFirstUnitAccount = unitId !== DEFAULT_UNIT_ID && !(await hasAccountsInUnit(unitId));
   const nextAccount = {
     uid,
     displayName: trimmedDisplayName,
@@ -211,9 +275,10 @@ export async function registerWithUsername({ displayName, email, username, passw
     username: trimmedUsername,
     usernameLower: normalizeUsername(trimmedUsername),
     passwordHash,
+    unitId,
     wrongPredictions: 0,
     lostMoney: 0,
-    isAdmin: isPrimaryAdminDisplayName(trimmedDisplayName),
+    isAdmin: isPrimaryAdminDisplayName(trimmedDisplayName) || isFirstUnitAccount,
     isLocked: false,
     createdAt: serverTimestamp()
   };
@@ -223,14 +288,14 @@ export async function registerWithUsername({ displayName, email, username, passw
   return toSessionUser(nextAccount);
 }
 
-export async function loginWithUsername({ username, password }) {
+export async function loginWithUsername({ username, password, unitId = DEFAULT_UNIT_ID }) {
   const trimmedUsername = String(username || '').trim();
 
   if (!trimmedUsername || !password) {
     throw new Error('Vui lòng nhập tài khoản và mật khẩu.');
   }
 
-  const account = await findAccountByUsername(trimmedUsername);
+  const account = await findAccountByUsername(trimmedUsername, unitId);
   if (!account) {
     throw new Error('Tài khoản hoặc mật khẩu không đúng.');
   }

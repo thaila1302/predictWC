@@ -63,3 +63,10 @@ npm run build
 - Nhập `matches.json`
 - Đặt tỷ số và đánh dấu trận đấu là `finished`
 - Ứng dụng tự động tính lại điểm dự đoán và tổng điểm bảng xếp hạng
+
+## Đơn vị người chơi
+
+- Nhóm mặc định sử dụng các đường dẫn hiện tại như `/matches` và `/leaderboard`.
+- Đơn vị `donvi` sử dụng `/donvi/matches`, `/donvi/leaderboard` và `/donvi/admin`.
+- Các đơn vị dùng chung lịch thi đấu và kết quả, nhưng tài khoản, dự đoán và bảng xếp hạng được tách theo `unitId`.
+- Tài khoản đầu tiên đăng ký tại `/donvi` được cấp quyền quản trị của đơn vị đó.

@@ -16,37 +16,44 @@ import RequireAuth from './components/RequireAuth';
 import RequireAdmin from './components/RequireAdmin';
 
 export default function App() {
+  const unitRoutes = (prefix = '') => (
+    <>
+      <Route path={`${prefix}/auth`} element={<AuthPage />} />
+      <Route
+        path={prefix || '/'}
+        element={
+          <RequireAuth>
+            <Layout />
+          </RequireAuth>
+        }
+      >
+        <Route index element={<Navigate to={`${prefix}/matches`} replace />} />
+        <Route path="knockout" element={<KnockoutPage />} />
+        <Route path="round-of-16" element={<RoundOf16Page />} />
+        <Route path="quarter-finals" element={<QuarterFinalsPage />} />
+        <Route path="semi-finals" element={<SemiFinalsPage />} />
+        <Route path="third-place" element={<ThirdPlacePage />} />
+        <Route path="final" element={<FinalPage />} />
+        <Route path="matches" element={<MatchesPage />} />
+        <Route path="leaderboard" element={<LeaderboardPage />} />
+        <Route
+          path="admin"
+          element={
+            <RequireAdmin>
+              <AdminPage />
+            </RequireAdmin>
+          }
+        />
+      </Route>
+    </>
+  );
+
   return (
     <DevelopModeProvider>
       <AuthProvider>
         <Routes>
-          <Route path="/auth" element={<AuthPage />} />
-          <Route
-            path="/"
-            element={
-              <RequireAuth>
-                <Layout />
-              </RequireAuth>
-            }
-          >
-            <Route index element={<Navigate to="/matches" replace />} />
-            <Route path="knockout" element={<KnockoutPage />} />
-            <Route path="round-of-16" element={<RoundOf16Page />} />
-            <Route path="quarter-finals" element={<QuarterFinalsPage />} />
-            <Route path="semi-finals" element={<SemiFinalsPage />} />
-            <Route path="third-place" element={<ThirdPlacePage />} />
-            <Route path="final" element={<FinalPage />} />
-            <Route path="matches" element={<MatchesPage />} />
-            <Route path="leaderboard" element={<LeaderboardPage />} />
-            <Route
-              path="admin"
-              element={
-                <RequireAdmin>
-                  <AdminPage />
-                </RequireAdmin>
-              }
-            />
-          </Route>
+          {unitRoutes()}
+          {unitRoutes('/donvi')}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AuthProvider>

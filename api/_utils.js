@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { collection, getDocs, limit, query, where } from 'firebase/firestore';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import nodemailer from 'nodemailer';
 import { db } from './_firebase.js';
 
@@ -26,23 +26,29 @@ export function assertPost(request, response) {
   return false;
 }
 
-export async function findUserByIdentifier(identifier) {
+function getUserUnitId(user) {
+  return user?.unitId || 'default';
+}
+
+export async function findUserByIdentifier(identifier, unitId = 'default') {
   const normalized = normalizeIdentifier(identifier);
   if (!normalized) return null;
 
   const usersCollection = collection(db, 'users');
-  const emailQuery = query(usersCollection, where('email', '==', normalized), limit(1));
+  const emailQuery = query(usersCollection, where('email', '==', normalized));
   const emailSnapshot = await getDocs(emailQuery);
-  if (!emailSnapshot.empty) {
-    const userDoc = emailSnapshot.docs[0];
+  const emailDoc = emailSnapshot.docs.find((item) => getUserUnitId(item.data()) === unitId);
+  if (emailDoc) {
+    const userDoc = emailDoc;
     return { id: userDoc.id, ...userDoc.data() };
   }
 
-  const usernameQuery = query(usersCollection, where('usernameLower', '==', normalized), limit(1));
+  const usernameQuery = query(usersCollection, where('usernameLower', '==', normalized));
   const usernameSnapshot = await getDocs(usernameQuery);
-  if (usernameSnapshot.empty) return null;
+  const usernameDoc = usernameSnapshot.docs.find((item) => getUserUnitId(item.data()) === unitId);
+  if (!usernameDoc) return null;
 
-  const userDoc = usernameSnapshot.docs[0];
+  const userDoc = usernameDoc;
   return { id: userDoc.id, ...userDoc.data() };
 }
 

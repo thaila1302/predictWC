@@ -13,8 +13,13 @@ import {
 import { db } from '../firebase';
 import { getMatchSortTime, getResultFromScores, toDate } from '../lib/utils';
 import { DEFAULT_STAKE, getMatchStake } from '../lib/stakes';
+import { DEFAULT_UNIT_ID } from '../context/UnitContext';
 
 const PREDICTION_LOCK_OFFSET_MS = 30 * 60 * 1000;
+
+function getItemUnitId(item) {
+  return item?.unitId || DEFAULT_UNIT_ID;
+}
 
 function wasUserEligibleToPredict(user, match) {
   const createdAt = toDate(user.createdAt);
@@ -43,11 +48,12 @@ export function listenGroups(callback) {
   });
 }
 
-export function listenLeaderboard(callback) {
+export function listenLeaderboard(unitId, callback, includeAllUnits = false) {
   const q = query(collection(db, 'users'));
   return onSnapshot(q, (snapshot) => {
     const players = snapshot.docs
       .map((item) => ({ id: item.id, ...item.data() }))
+      .filter((player) => includeAllUnits || getItemUnitId(player) === unitId)
       .filter((player) => player.displayName || player.username || player.email)
       .sort((left, right) => {
         const lostMoneyDiff = (right.lostMoney || 0) - (left.lostMoney || 0);
@@ -62,27 +68,36 @@ export function listenLeaderboard(callback) {
   });
 }
 
-export function listenUserPredictions(userId, callback) {
+export function listenUserPredictions(userId, unitId, callback) {
   const q = query(collection(db, 'predictions'), where('userId', '==', userId));
   return onSnapshot(q, (snapshot) => {
-    callback(snapshot.docs.map((item) => ({ id: item.id, ...item.data() })));
+    callback(
+      snapshot.docs
+        .map((item) => ({ id: item.id, ...item.data() }))
+        .filter((prediction) => getItemUnitId(prediction) === unitId)
+    );
   });
 }
 
-export function listenAllPredictions(callback) {
+export function listenAllPredictions(unitId, callback, includeAllUnits = false) {
   const q = query(collection(db, 'predictions'));
   return onSnapshot(q, (snapshot) => {
-    callback(snapshot.docs.map((item) => ({ id: item.id, ...item.data() })));
+    callback(
+      snapshot.docs
+        .map((item) => ({ id: item.id, ...item.data() }))
+        .filter((prediction) => includeAllUnits || getItemUnitId(prediction) === unitId)
+    );
   });
 }
 
-export async function savePrediction({ userId, matchId, predictedResult }) {
+export async function savePrediction({ userId, matchId, predictedResult, unitId = DEFAULT_UNIT_ID }) {
   const predictionRef = doc(db, 'predictions', `${userId}_${matchId}`);
   await setDoc(
     predictionRef,
     {
       userId,
       matchId,
+      unitId,
       predictedResult,
       resultStatus: 'pending',
       createdAt: serverTimestamp(),
@@ -169,6 +184,7 @@ export async function saveMatchAndSyncScores(matchId, payload) {
         {
           userId,
           matchId,
+          unitId: getItemUnitId(userDoc.data()),
           predictedResult: null,
           resultStatus: 'wrong',
           lostAmount: matchStake,

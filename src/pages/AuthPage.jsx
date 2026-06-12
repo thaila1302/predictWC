@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { LogIn, UserRoundPlus } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useUnit } from '../context/UnitContext';
 
 const tabs = [
   { value: 'login', label: 'Đăng nhập', icon: LogIn },
@@ -33,6 +34,7 @@ async function postJson(url, body) {
 export default function AuthPage() {
   const location = useLocation();
   const { isAuthenticated, login, register, loading } = useAuth();
+  const { unitId, pathFor } = useUnit();
   const [mode, setMode] = useState('login');
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
@@ -56,7 +58,7 @@ export default function AuthPage() {
   const [resetCodeSent, setResetCodeSent] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
 
-  const redirectTo = useMemo(() => location.state?.from || '/matches', [location.state]);
+  const redirectTo = useMemo(() => location.state?.from || pathFor('/matches'), [location.state, pathFor]);
 
   if (isAuthenticated) {
     return <Navigate to={redirectTo} replace />;
@@ -108,7 +110,7 @@ export default function AuthPage() {
 
     setResetLoading(true);
     try {
-      await postJson('/api/request-password-reset', { identifier: resetForm.identifier });
+      await postJson('/api/request-password-reset', { identifier: resetForm.identifier, unitId });
 
       setResetCodeSent(true);
       setNotice('Mã xác nhận đã được gửi. Vui lòng kiểm tra email của bạn.');
@@ -148,6 +150,7 @@ export default function AuthPage() {
     try {
       await postJson('/api/confirm-password-reset', {
         identifier: resetForm.identifier,
+        unitId,
         code: resetForm.code,
         newPassword: resetForm.newPassword
       });

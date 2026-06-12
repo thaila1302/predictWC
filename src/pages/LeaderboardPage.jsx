@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { ShieldAlert, UsersRound } from 'lucide-react';
 import SectionHeader from '../components/SectionHeader';
 import { listenLeaderboard } from '../services/firestore';
+import { useUnit } from '../context/UnitContext';
 
 function formatLostMoney(lostMoney) {
   return new Intl.NumberFormat('vi-VN', {
@@ -13,8 +14,9 @@ function formatLostMoney(lostMoney) {
 
 export default function LeaderboardPage() {
   const [players, setPlayers] = useState([]);
+  const { unitId } = useUnit();
 
-  useEffect(() => listenLeaderboard(setPlayers), []);
+  useEffect(() => listenLeaderboard(unitId, setPlayers), [unitId]);
 
   return (
     <div>
