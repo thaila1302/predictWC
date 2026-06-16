@@ -99,6 +99,7 @@ export async function savePrediction({ userId, matchId, predictedResult, unitId 
       matchId,
       unitId,
       predictedResult,
+      autoMissed: false,
       resultStatus: 'pending',
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
@@ -135,6 +136,7 @@ export async function saveMatchAndSyncScores(matchId, payload) {
 
   predictionsSnapshot.docs.forEach((predictionDoc) => {
     const prediction = predictionDoc.data();
+    const hasUserChoice = Boolean(prediction.predictedResult);
 
     if (!existingUserIds.has(prediction.userId)) {
       batch.delete(predictionDoc.ref);
@@ -143,9 +145,12 @@ export async function saveMatchAndSyncScores(matchId, payload) {
 
     const isFinished = Boolean(computedWinner) && payload.status === 'finished';
     const isInvalidMissedPrediction =
-      isFinished && prediction.autoMissed && !wasUserEligibleToPredict(usersById.get(prediction.userId) || {}, payload);
+      isFinished &&
+      prediction.autoMissed &&
+      !hasUserChoice &&
+      !wasUserEligibleToPredict(usersById.get(prediction.userId) || {}, payload);
 
-    if (isInvalidMissedPrediction) {
+    if (isInvalidMissedPrediction || (!isFinished && prediction.autoMissed && !hasUserChoice)) {
       batch.delete(predictionDoc.ref);
       return;
     }
@@ -153,7 +158,7 @@ export async function saveMatchAndSyncScores(matchId, payload) {
     predictedUserIds.add(prediction.userId);
     const nextResultStatus =
       isFinished
-        ? prediction.predictedResult === computedWinner
+        ? hasUserChoice && prediction.predictedResult === computedWinner
           ? 'not_wrong'
           : 'wrong'
         : 'pending';
@@ -163,6 +168,7 @@ export async function saveMatchAndSyncScores(matchId, payload) {
       {
         resultStatus: nextResultStatus,
         lostAmount,
+        autoMissed: hasUserChoice ? false : Boolean(prediction.autoMissed),
         updatedAt: serverTimestamp()
       },
       { merge: true }

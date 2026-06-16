@@ -24,20 +24,28 @@ export default function LeaderboardPage() {
 
   const finishedMatchCount = useMemo(() => matches.filter((match) => match.status === 'finished').length, [matches]);
   const kingCrabFund = useMemo(() => players.reduce((total, player) => total + (Number(player.lostMoney) || 0), 0), [players]);
+  const matchById = useMemo(() => new Map(matches.map((match) => [match.id, match])), [matches]);
 
   const predictionStatsByUser = useMemo(() => {
     const stats = new Map();
 
     predictions.forEach((prediction) => {
       const current = stats.get(prediction.userId) || { missed: 0 };
-      if (prediction.autoMissed) {
+      const match = matchById.get(prediction.matchId);
+      const isActiveMissedPrediction =
+        prediction.autoMissed &&
+        !prediction.predictedResult &&
+        prediction.resultStatus === 'wrong' &&
+        match?.status === 'finished';
+
+      if (isActiveMissedPrediction) {
         current.missed += 1;
       }
       stats.set(prediction.userId, current);
     });
 
     return stats;
-  }, [predictions]);
+  }, [matchById, predictions]);
 
   return (
     <div>
