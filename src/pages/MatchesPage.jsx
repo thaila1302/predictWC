@@ -21,6 +21,7 @@ import useMatchSpotlight from '../hooks/useMatchSpotlight';
 import useCurrentTime from '../hooks/useCurrentTime';
 import seedMatches from '../../data/matches.json';
 import { useUnit } from '../context/UnitContext';
+import useResumeRefreshKey from '../hooks/useResumeRefreshKey';
 
 function formatDayKey(value) {
   return getVietnamCalendarDayKey(value);
@@ -159,6 +160,7 @@ export default function MatchesPage() {
   const { user } = useAuth();
   const { unitId } = useUnit();
   const now = useCurrentTime();
+  const resumeRefreshKey = useResumeRefreshKey();
 
   useEffect(() => {
     return listenMatches((remoteMatches) => {
@@ -166,7 +168,7 @@ export default function MatchesPage() {
         setMatches(mergeMatchesById(seedMatches.groupStage || [], remoteMatches));
       }
     });
-  }, []);
+  }, [resumeRefreshKey]);
 
   useEffect(() => {
     if (!user?.uid) {
@@ -174,7 +176,7 @@ export default function MatchesPage() {
     }
 
     return listenUserPredictions(user.uid, unitId, setPredictions);
-  }, [unitId, user?.uid]);
+  }, [resumeRefreshKey, unitId, user?.uid]);
 
   const predictionMap = useMemo(() => new Map(predictions.map((item) => [item.matchId, item])), [predictions]);
   const displayMatches = useMemo(

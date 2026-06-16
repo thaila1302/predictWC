@@ -25,6 +25,7 @@ import seedThirdPlace from '../../data/third-place.json';
 import seedFinal from '../../data/final.json';
 import useCurrentTime from '../hooks/useCurrentTime';
 import { DEFAULT_UNIT_ID, SECONDARY_UNIT_ID, useUnit } from '../context/UnitContext';
+import useResumeRefreshKey from '../hooks/useResumeRefreshKey';
 
 const PRIMARY_ADMIN_NAME = 'Lê Anh Thái';
 
@@ -733,6 +734,7 @@ export default function AdminPage() {
   const now = useCurrentTime();
   const { user: currentUser } = useAuth();
   const { unitId } = useUnit();
+  const resumeRefreshKey = useResumeRefreshKey();
 
   useEffect(() => {
     return listenMatches((remoteMatches) => {
@@ -740,12 +742,15 @@ export default function AdminPage() {
         setMatches(mergeMatchesById(fallbackMatches, remoteMatches));
       }
     });
-  }, []);
+  }, [resumeRefreshKey]);
 
   const isPrimaryAdmin = currentUser?.displayName === PRIMARY_ADMIN_NAME;
 
-  useEffect(() => listenLeaderboard(unitId, setUsers, isPrimaryAdmin), [isPrimaryAdmin, unitId]);
-  useEffect(() => listenAllPredictions(unitId, setPredictions, isPrimaryAdmin), [isPrimaryAdmin, unitId]);
+  useEffect(() => listenLeaderboard(unitId, setUsers, isPrimaryAdmin), [isPrimaryAdmin, resumeRefreshKey, unitId]);
+  useEffect(
+    () => listenAllPredictions(unitId, setPredictions, isPrimaryAdmin),
+    [isPrimaryAdmin, resumeRefreshKey, unitId]
+  );
 
   const displayMatches = useMemo(
     () => applyMatchOverrides(matches).map((match) => ({ ...match, status: getEffectiveMatchStatus(match, now) })),

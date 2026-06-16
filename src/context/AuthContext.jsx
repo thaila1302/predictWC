@@ -8,6 +8,7 @@ import {
 } from '../services/auth';
 import { DEFAULT_UNIT_ID, SECONDARY_UNIT_ID, useUnit } from './UnitContext';
 import { setActiveUnit } from '../components/UnitAccessRedirect';
+import useResumeRefreshKey from '../hooks/useResumeRefreshKey';
 
 const AUTH_SESSION_KEY_PREFIX = 'predictwc_auth_uid';
 
@@ -32,6 +33,7 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(false);
   const [bootstrapping, setBootstrapping] = useState(true);
   const [sessionUid, setSessionUid] = useState(() => readStoredUid(unitId));
+  const resumeRefreshKey = useResumeRefreshKey();
 
   useEffect(() => {
     setUser(null);
@@ -116,7 +118,7 @@ export function AuthProvider({ children }) {
         isLocked: Boolean(nextAccount.isLocked)
       });
     });
-  }, [sessionUid, unitId]);
+  }, [resumeRefreshKey, sessionUid, unitId]);
 
   const login = async (payload) => {
     setLoading(true);
