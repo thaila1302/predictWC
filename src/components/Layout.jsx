@@ -5,6 +5,7 @@ import {
   Crown,
   GitBranch,
   GitFork,
+  History,
   ListChecks,
   LogOut,
   Medal,
@@ -161,6 +162,15 @@ export default function Layout() {
                 <span className="truncate">{user?.displayName || user?.username || 'Người chơi'}</span>
                 <Pencil size={12} className="hidden shrink-0 text-cyan-600 group-hover:block sm:block" />
               </button>
+
+              <Link
+                to={pathFor('/history')}
+                className="inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/70 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-white sm:px-4 sm:text-sm"
+                title="Lịch sử dự đoán"
+              >
+                <History size={14} />
+                <span className="hidden sm:inline">Lịch sử</span>
+              </Link>
 
               <button
                 type="button"
