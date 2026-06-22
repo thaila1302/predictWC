@@ -49,11 +49,12 @@ export function listenGroups(callback) {
 }
 
 export function listenLeaderboard(unitId, callback, includeAllUnits = false) {
-  const q = query(collection(db, 'users'));
+  const q = includeAllUnits
+    ? query(collection(db, 'users'))
+    : query(collection(db, 'users'), where('unitId', '==', unitId));
   return onSnapshot(q, (snapshot) => {
     const players = snapshot.docs
       .map((item) => ({ id: item.id, ...item.data() }))
-      .filter((player) => includeAllUnits || getItemUnitId(player) === unitId)
       .filter((player) => player.displayName || player.username || player.email)
       .sort((left, right) => {
         const lostMoneyDiff = (right.lostMoney || 0) - (left.lostMoney || 0);
@@ -69,23 +70,21 @@ export function listenLeaderboard(unitId, callback, includeAllUnits = false) {
 }
 
 export function listenUserPredictions(userId, unitId, callback) {
-  const q = query(collection(db, 'predictions'), where('userId', '==', userId));
+  const q = query(collection(db, 'predictions'), where('userId', '==', userId), where('unitId', '==', unitId));
   return onSnapshot(q, (snapshot) => {
     callback(
-      snapshot.docs
-        .map((item) => ({ id: item.id, ...item.data() }))
-        .filter((prediction) => getItemUnitId(prediction) === unitId)
+      snapshot.docs.map((item) => ({ id: item.id, ...item.data() }))
     );
   });
 }
 
 export function listenAllPredictions(unitId, callback, includeAllUnits = false) {
-  const q = query(collection(db, 'predictions'));
+  const q = includeAllUnits
+    ? query(collection(db, 'predictions'))
+    : query(collection(db, 'predictions'), where('unitId', '==', unitId));
   return onSnapshot(q, (snapshot) => {
     callback(
-      snapshot.docs
-        .map((item) => ({ id: item.id, ...item.data() }))
-        .filter((prediction) => includeAllUnits || getItemUnitId(prediction) === unitId)
+      snapshot.docs.map((item) => ({ id: item.id, ...item.data() }))
     );
   });
 }

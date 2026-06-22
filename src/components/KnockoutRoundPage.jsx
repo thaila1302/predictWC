@@ -21,7 +21,6 @@ import { mergeMatchesById } from '../lib/matchMerge';
 import useMatchSpotlight from '../hooks/useMatchSpotlight';
 import useCurrentTime from '../hooks/useCurrentTime';
 import { useUnit } from '../context/UnitContext';
-import useResumeRefreshKey from '../hooks/useResumeRefreshKey';
 
 function normalizeRoundSeed(payload, roundKey, roundLabel) {
   return (payload?.matches || []).map((match, index) => ({
@@ -207,7 +206,6 @@ export default function KnockoutRoundPage({
   const { user } = useAuth();
   const { unitId } = useUnit();
   const now = useCurrentTime();
-  const resumeRefreshKey = useResumeRefreshKey();
 
   useEffect(() => {
     return listenMatches((remoteMatches) => {
@@ -220,7 +218,7 @@ export default function KnockoutRoundPage({
         setMatches(mergeMatchesById(normalizeRoundSeed(seedData, roundKey, roundLabel), knockoutMatches));
       }
     });
-  }, [resumeRefreshKey, roundKey, roundLabel, seedData]);
+  }, [roundKey, roundLabel, seedData]);
 
   useEffect(() => {
     if (!user?.uid) {
@@ -228,7 +226,7 @@ export default function KnockoutRoundPage({
     }
 
     return listenUserPredictions(user.uid, unitId, setPredictions);
-  }, [resumeRefreshKey, unitId, user?.uid]);
+  }, [unitId, user?.uid]);
 
   const predictionMap = useMemo(() => new Map(predictions.map((item) => [item.matchId, item])), [predictions]);
   const displayMatches = useMemo(

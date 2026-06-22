@@ -3,7 +3,6 @@ import { CheckCircle2, Crown, Landmark, ShieldAlert, UsersRound } from 'lucide-r
 import SectionHeader from '../components/SectionHeader';
 import { listenAllPredictions, listenLeaderboard, listenMatches } from '../services/firestore';
 import { useUnit } from '../context/UnitContext';
-import useResumeRefreshKey from '../hooks/useResumeRefreshKey';
 
 function formatLostMoney(lostMoney) {
   return new Intl.NumberFormat('vi-VN', {
@@ -18,11 +17,10 @@ export default function LeaderboardPage() {
   const [predictions, setPredictions] = useState([]);
   const [matches, setMatches] = useState([]);
   const { unitId } = useUnit();
-  const resumeRefreshKey = useResumeRefreshKey();
 
-  useEffect(() => listenLeaderboard(unitId, setPlayers), [resumeRefreshKey, unitId]);
-  useEffect(() => listenAllPredictions(unitId, setPredictions), [resumeRefreshKey, unitId]);
-  useEffect(() => listenMatches(setMatches), [resumeRefreshKey]);
+  useEffect(() => listenLeaderboard(unitId, setPlayers), [unitId]);
+  useEffect(() => listenAllPredictions(unitId, setPredictions), [unitId]);
+  useEffect(() => listenMatches(setMatches), []);
 
   const finishedMatchCount = useMemo(() => matches.filter((match) => match.status === 'finished').length, [matches]);
   const kingCrabFund = useMemo(() => players.reduce((total, player) => total + (Number(player.lostMoney) || 0), 0), [players]);
