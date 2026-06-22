@@ -36,7 +36,14 @@ export default function App() {
         <Route path="third-place" element={<ThirdPlacePage />} />
         <Route path="final" element={<FinalPage />} />
         <Route path="matches" element={<MatchesPage />} />
-        <Route path="history" element={<HistoryPage />} />
+        <Route
+          path="history"
+          element={
+            <RequireAdmin>
+              <HistoryPage />
+            </RequireAdmin>
+          }
+        />
         <Route path="leaderboard" element={<LeaderboardPage />} />
         <Route
           path="admin"

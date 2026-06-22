@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Clock3, CalendarDays } from 'lucide-react';
 import { formatDateTime, formatVietnamDay, getEffectiveMatchStatus, toDate } from '../lib/utils';
-import { listenMatches, listenUserPredictions } from '../services/firestore';
+import { listenMatches, listenAllPredictions, listenLeaderboard } from '../services/firestore';
 import { useAuth } from '../context/AuthContext';
 import { useUnit } from '../context/UnitContext';
 
@@ -28,7 +28,9 @@ export default function HistoryPage() {
   const { user } = useAuth();
   const { unitId } = useUnit();
   const [matches, setMatches] = useState([]);
-  const [predictions, setPredictions] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [allPredictions, setAllPredictions] = useState([]);
+  const [selectedUserId, setSelectedUserId] = useState('');
 
   useEffect(() => {
     return listenMatches((remoteMatches) => {
@@ -40,18 +42,51 @@ export default function HistoryPage() {
   }, []);
 
   useEffect(() => {
-    if (!user?.uid) return undefined;
-    return listenUserPredictions(user.uid, unitId, setPredictions);
-  }, [user?.uid, unitId]);
+    return listenLeaderboard(unitId, setUsers);
+  }, [unitId]);
+
+  useEffect(() => {
+    return listenAllPredictions(unitId, setAllPredictions);
+  }, [unitId]);
+
+  useEffect(() => {
+    if (!selectedUserId && users.length > 0) {
+      setSelectedUserId(users[0].id);
+    }
+  }, [selectedUserId, users]);
+
+  const selectedUser = useMemo(
+    () => users.find((item) => item.id === selectedUserId) || null,
+    [users, selectedUserId]
+  );
+
+  const predictionCountByUser = useMemo(() => {
+    const counts = new Map();
+
+    allPredictions.forEach((prediction) => {
+      counts.set(prediction.userId, (counts.get(prediction.userId) || 0) + 1);
+    });
+
+    return counts;
+  }, [allPredictions]);
+
+  const filteredPredictions = useMemo(
+    () => allPredictions.filter((prediction) => prediction.userId === selectedUserId),
+    [allPredictions, selectedUserId]
+  );
 
   const rows = useMemo(() => {
     const matchesById = new Map(matches.map((match) => [match.id, match]));
 
-    return predictions
+    return filteredPredictions
       .map((prediction) => {
         const match = matchesById.get(prediction.matchId) || {};
         const confirmedAt = prediction.createdAt || prediction.updatedAt || match.matchTime;
-        const hasResult = match.homeScore !== null && match.homeScore !== undefined && match.awayScore !== null && match.awayScore !== undefined;
+        const hasResult =
+          match.homeScore !== null &&
+          match.homeScore !== undefined &&
+          match.awayScore !== null &&
+          match.awayScore !== undefined;
         const resultLabel = hasResult
           ? match.homeScore === match.awayScore
             ? 'Hòa'
@@ -81,22 +116,43 @@ export default function HistoryPage() {
         const rightTime = toDate(right.matchTime)?.getTime() || 0;
         return leftTime - rightTime;
       });
-  }, [matches, predictions]);
+  }, [matches, filteredPredictions]);
 
   return (
     <div className="space-y-6">
-      <div className="rounded-[1.5rem] border border-slate-200/70 bg-white p-6 shadow-glow ring-1 ring-slate-200/70">
+      <div className="rounded-[1.5rem] border border-slate-200/70 bg-white p-4 shadow-glow ring-1 ring-slate-200/70">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-cyan-500">Lịch sử dự đoán</p>
-            <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950">Tất cả dự đoán của bạn</h1>
-            <p className="mt-2 max-w-2xl text-sm text-slate-600">
-              Xem lại những trận bạn đã dự đoán, lựa chọn kết quả, thời gian và ngày thi đấu.
+            <p className="text-sm font-semibold text-slate-900">Danh sách người dùng</p>
+            <p className="mt-1 text-sm text-slate-500">
+              {selectedUser
+                ? `Đang xem lịch sử của ${selectedUser.displayName || selectedUser.username}`
+                : 'Chọn một người dùng để xem lịch sử dự đoán.'}
             </p>
           </div>
-          <div className="flex items-center gap-2 rounded-3xl bg-cyan-50 px-4 py-3 text-cyan-700 ring-1 ring-cyan-200">
-            <Clock3 size={18} />
-            <span>{user?.displayName || user?.username || 'Người chơi'}</span>
+          <div className="text-sm font-semibold text-slate-700">
+            {selectedUser ? `${predictionCountByUser.get(selectedUser.id) || 0} dự đoán` : ''}
+          </div>
+        </div>
+        <div className="mt-4 overflow-x-auto">
+          <div className="flex gap-2">
+            {users.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => setSelectedUserId(item.id)}
+                className={`rounded-full border px-4 py-2 text-sm font-semibold transition whitespace-nowrap ${
+                  selectedUserId === item.id
+                    ? 'bg-cyan-500 text-white border-cyan-500'
+                    : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'
+                }`}
+              >
+                {item.displayName || item.username || 'Người dùng'}
+                <span className="ml-2 text-xs font-medium text-slate-500">
+                  ({predictionCountByUser.get(item.id) || 0})
+                </span>
+              </button>
+            ))}
           </div>
         </div>
       </div>
@@ -111,7 +167,7 @@ export default function HistoryPage() {
         </div>
         <div>
           {rows.length === 0 ? (
-            <div className="p-8 text-center text-slate-500">Bạn chưa có dự đoán nào.</div>
+            <div className="p-8 text-center text-slate-500">Không có dự đoán cho người dùng này.</div>
           ) : (
             rows.map((row) => (
               <div
