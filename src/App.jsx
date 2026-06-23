@@ -10,7 +10,6 @@ import ThirdPlacePage from './pages/ThirdPlacePage';
 import FinalPage from './pages/FinalPage';
 import AdminPage from './pages/AdminPage';
 import AuthPage from './pages/AuthPage';
-import HistoryPage from './pages/HistoryPage';
 import { DevelopModeProvider } from './context/DevelopModeContext';
 import { AuthProvider } from './context/AuthContext';
 import RequireAuth from './components/RequireAuth';
@@ -36,14 +35,6 @@ export default function App() {
         <Route path="third-place" element={<ThirdPlacePage />} />
         <Route path="final" element={<FinalPage />} />
         <Route path="matches" element={<MatchesPage />} />
-        <Route
-          path="history"
-          element={
-            <RequireAdmin>
-              <HistoryPage />
-            </RequireAdmin>
-          }
-        />
         <Route path="leaderboard" element={<LeaderboardPage />} />
         <Route
           path="admin"
