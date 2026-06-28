@@ -163,7 +163,11 @@ export default function MatchesPage() {
   useEffect(() => {
     return listenMatches((remoteMatches) => {
       if (remoteMatches.length > 0) {
-        setMatches(mergeMatchesById(seedMatches.groupStage || [], remoteMatches));
+        // Only include group stage matches from remote
+        const groupStageRemoteMatches = remoteMatches.filter(match => 
+          match.stage === 'group_stage' || match.group
+        );
+        setMatches(mergeMatchesById(seedMatches.groupStage || [], groupStageRemoteMatches));
       }
     });
   }, []);
