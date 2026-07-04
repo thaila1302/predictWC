@@ -136,17 +136,11 @@ function MatchSeparatorIcon({ match }) {
 }
 
 function MatchCard({ match, prediction, onPredict, saving, roundLabel, teamNameOverride }) {
-  const { matchOverrides } = useDevelopMode();
   const finished = match.status === 'finished';
   const locked = finished || isPredictionLocked(match.matchTime);
   const isSpotlightMatch = useMatchSpotlight(match.matchTime) && match.status !== 'finished';
-  const override = matchOverrides[match.id] || {};
-  const homeTeamName = Object.prototype.hasOwnProperty.call(override, 'homeTeam')
-    ? match.homeTeam
-    : teamNameOverride || match.homeTeam;
-  const awayTeamName = Object.prototype.hasOwnProperty.call(override, 'awayTeam')
-    ? match.awayTeam
-    : teamNameOverride || match.awayTeam;
+  const homeTeamName = match.homeTeam || teamNameOverride || 'Chờ đội';
+  const awayTeamName = match.awayTeam || teamNameOverride || 'Chờ đội';
 
   return (
     <article className={`flex h-full flex-col overflow-hidden rounded-[1.25rem] border border-white/10 bg-slate-950/70 shadow-glow ring-1 ring-white/5 transition hover:border-white/20 ${isSpotlightMatch ? 'match-spotlight-card' : ''} ${finished ? 'finished-match-card' : ''}`}>
