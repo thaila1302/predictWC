@@ -2,11 +2,13 @@ import {
   getDocs,
   collection,
   doc,
+  limit,
   onSnapshot,
   orderBy,
   query,
   serverTimestamp,
   setDoc,
+  startAfter,
   writeBatch,
   where
 } from 'firebase/firestore';
@@ -87,6 +89,34 @@ export function listenAllPredictions(unitId, callback, includeAllUnits = false) 
       snapshot.docs.map((item) => ({ id: item.id, ...item.data() }))
     );
   });
+}
+
+export async function getAdminMatches() {
+  const snapshot = await getDocs(query(collection(db, 'matches'), orderBy('matchTime', 'asc')));
+  return snapshot.docs.map((item) => ({ id: item.id, ...item.data() }));
+}
+
+export async function getAdminUsers(unitId, includeAllUnits = false) {
+  const q = includeAllUnits
+    ? query(collection(db, 'users'))
+    : query(collection(db, 'users'), where('unitId', '==', unitId));
+  const snapshot = await getDocs(q);
+  return snapshot.docs
+    .map((item) => ({ id: item.id, ...item.data() }))
+    .filter((player) => player.displayName || player.username || player.email);
+}
+
+export async function getAdminPredictions(unitId, includeAllUnits = false, cursor = null, pageSize = 100) {
+  const constraints = [limit(pageSize)];
+  if (cursor) constraints.unshift(startAfter(cursor));
+  if (!includeAllUnits) constraints.unshift(where('unitId', '==', unitId));
+
+  const snapshot = await getDocs(query(collection(db, 'predictions'), ...constraints));
+  return {
+    items: snapshot.docs.map((item) => ({ id: item.id, ...item.data() })),
+    cursor: snapshot.docs.at(-1) || null,
+    hasMore: snapshot.docs.length === pageSize
+  };
 }
 
 export async function savePrediction({ userId, matchId, predictedResult, unitId = DEFAULT_UNIT_ID }) {

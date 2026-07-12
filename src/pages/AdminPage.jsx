@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Check, Clock3, Search, Shield, Target, Users, X } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Check, Clock3, RefreshCw, Search, Shield, Target, Users, X } from 'lucide-react';
 import StatusBadge from '../components/StatusBadge';
 import DevMatchEditor from '../components/DevMatchEditor';
 import {
@@ -11,7 +11,7 @@ import {
   parseVietnamDateTimeLocal,
   toDate
 } from '../lib/utils';
-import { listenAllPredictions, listenLeaderboard, listenMatches } from '../services/firestore';
+import { getAdminMatches, getAdminPredictions, getAdminUsers } from '../services/firestore';
 import { updateUserAccess, updateUserUnit } from '../services/auth';
 import { useDevelopMode } from '../context/DevelopModeContext';
 import { useAuth } from '../context/AuthContext';
@@ -729,119 +729,89 @@ export default function AdminPage() {
   const [matches, setMatches] = useState(fallbackMatches);
   const [users, setUsers] = useState([]);
   const [predictions, setPredictions] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [predictionsHasMore, setPredictionsHasMore] = useState(false);
+  const loadedTabs = useRef(new Set());
+  const predictionCursor = useRef(null);
   const { applyMatchOverrides } = useDevelopMode();
   const now = useCurrentTime();
   const { user: currentUser } = useAuth();
   const { unitId } = useUnit();
-
-  useEffect(() => {
-    return listenMatches((remoteMatches) => {
-      if (remoteMatches.length > 0) {
-        setMatches(mergeMatchesById(fallbackMatches, remoteMatches));
-      }
-    });
-  }, []);
-
   const isPrimaryAdmin = currentUser?.displayName === PRIMARY_ADMIN_NAME;
+  const cachePrefix = `${unitId}:${isPrimaryAdmin ? 'all' : 'unit'}`;
 
-  useEffect(() => listenLeaderboard(unitId, setUsers, isPrimaryAdmin), [isPrimaryAdmin, unitId]);
-  useEffect(
-    () => listenAllPredictions(unitId, setPredictions, isPrimaryAdmin),
-    [isPrimaryAdmin, unitId]
-  );
+  const loadTab = useCallback(async (tab, force = false) => {
+    const cacheKey = `${cachePrefix}:${tab}`;
+    if (!force && loadedTabs.current.has(cacheKey)) return;
+    setIsLoading(true);
+    try {
+      if (tab === 'matches') {
+        const remoteMatches = await getAdminMatches();
+        if (remoteMatches.length > 0) setMatches(mergeMatchesById(fallbackMatches, remoteMatches));
+      } else if (tab === 'users') {
+        setUsers(await getAdminUsers(unitId, isPrimaryAdmin));
+      } else {
+        const page = await getAdminPredictions(unitId, isPrimaryAdmin);
+        setPredictions(page.items);
+        predictionCursor.current = page.cursor;
+        setPredictionsHasMore(page.hasMore);
+      }
+      loadedTabs.current.add(cacheKey);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [cachePrefix, isPrimaryAdmin, unitId]);
+
+  const loadMorePredictions = useCallback(async () => {
+    if (!predictionsHasMore || isLoadingMore) return;
+    setIsLoadingMore(true);
+    try {
+      const page = await getAdminPredictions(unitId, isPrimaryAdmin, predictionCursor.current);
+      setPredictions((items) => [...items, ...page.items]);
+      predictionCursor.current = page.cursor;
+      setPredictionsHasMore(page.hasMore);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }, [isLoadingMore, isPrimaryAdmin, predictionsHasMore, unitId]);
+
+  useEffect(() => { void loadTab(activeTab); }, [activeTab, loadTab]);
 
   const displayMatches = useMemo(
     () => applyMatchOverrides(matches).map((match) => ({ ...match, status: getEffectiveMatchStatus(match, now) })),
     [applyMatchOverrides, matches, now]
   );
   const matchRoundOptions = useMemo(() => getMatchRoundOptions(displayMatches), [displayMatches]);
-
-  const sortedUsers = useMemo(() => {
-    return [...users].sort((left, right) => {
-      const adminDiff = Number(Boolean(right.isAdmin)) - Number(Boolean(left.isAdmin));
-      if (adminDiff !== 0) return adminDiff;
-      return String(left.displayName || '').localeCompare(String(right.displayName || ''));
-    });
-  }, [users]);
-
-  const predictionCountByUser = useMemo(() => {
-    const counts = new Map();
-    predictions.forEach((prediction) => {
-      counts.set(prediction.userId, (counts.get(prediction.userId) || 0) + 1);
-    });
+  const sortedUsers = useMemo(() => [...users].sort((left, right) => {
+    const adminDiff = Number(Boolean(right.isAdmin)) - Number(Boolean(left.isAdmin));
+    return adminDiff || String(left.displayName || '').localeCompare(String(right.displayName || ''));
+  }), [users]);
+  const predictionCountByUser = useMemo(() => predictions.reduce((counts, prediction) => {
+    counts.set(prediction.userId, (counts.get(prediction.userId) || 0) + 1);
     return counts;
-  }, [predictions]);
-
-  const handleToggleAdmin = async (targetUser) => {
-    await updateUserAccess(targetUser.uid || targetUser.id, {
-      isAdmin: !targetUser.isAdmin
-    });
-  };
-
-  const handleToggleLocked = async (targetUser) => {
-    await updateUserAccess(targetUser.uid || targetUser.id, {
-      isLocked: !targetUser.isLocked
-    });
-  };
-
-  const handleChangeUnit = async (targetUser, nextUnitId) => {
-    await updateUserUnit(targetUser.uid || targetUser.id, nextUnitId);
-  };
+  }, new Map()), [predictions]);
+  const handleToggleAdmin = (targetUser) => updateUserAccess(targetUser.uid || targetUser.id, { isAdmin: !targetUser.isAdmin });
+  const handleToggleLocked = (targetUser) => updateUserAccess(targetUser.uid || targetUser.id, { isLocked: !targetUser.isLocked });
+  const handleChangeUnit = (targetUser, nextUnitId) => updateUserUnit(targetUser.uid || targetUser.id, nextUnitId);
 
   return (
     <div>
-      <div className="mb-6 grid gap-2 lg:grid-cols-3">
-        <div className="flex flex-wrap gap-2">
-          <AdminTabButton
-            active={activeTab === 'matches'}
-            icon={Shield}
-            label="Trận đấu"
-            onClick={() => setActiveTab('matches')}
-          />
-          {activeTab === 'matches' ? (
-            <div className="min-w-[220px] flex-1">
-              <FilterSelect
-                value={matchRoundFilter}
-                onChange={setMatchRoundFilter}
-                options={matchRoundOptions}
-                placeholder="Tất cả vòng đấu"
-              />
-            </div>
-          ) : null}
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
+        <div className="grid flex-1 gap-2 lg:grid-cols-3">
+          <div className="flex flex-wrap gap-2">
+            <AdminTabButton active={activeTab === 'matches'} icon={Shield} label="Trận đấu" onClick={() => setActiveTab('matches')} />
+            {activeTab === 'matches' ? <div className="min-w-[220px] flex-1"><FilterSelect value={matchRoundFilter} onChange={setMatchRoundFilter} options={matchRoundOptions} placeholder="Tất cả vòng đấu" /></div> : null}
+          </div>
+          {adminTabs.filter((tab) => tab.id !== 'matches').map((tab) => <AdminTabButton key={tab.id} active={activeTab === tab.id} icon={tab.icon} label={tab.label} className="w-full justify-center" onClick={() => setActiveTab(tab.id)} />)}
         </div>
-
-        {adminTabs
-          .filter((tab) => tab.id !== 'matches')
-          .map((tab) => (
-            <AdminTabButton
-              key={tab.id}
-              active={activeTab === tab.id}
-              icon={tab.icon}
-              label={tab.label}
-              className="w-full justify-center"
-              onClick={() => setActiveTab(tab.id)}
-            />
-          ))}
+        <button id="admin-refresh-tab" type="button" onClick={() => void loadTab(activeTab, true)} disabled={isLoading} className="inline-flex items-center gap-2 rounded-2xl bg-white/10 px-4 py-3 text-sm font-bold text-white transition hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-50">
+          <RefreshCw size={16} className={isLoading ? 'animate-spin' : ''} />{isLoading ? 'Đang tải...' : 'Tải lại'}
+        </button>
       </div>
-
-      {activeTab === 'matches' ? (
-        <MatchesTab matches={displayMatches} roundFilter={matchRoundFilter} />
-      ) : null}
-
-      {activeTab === 'users' ? (
-        <UsersTab
-          users={sortedUsers}
-          predictionCountByUser={predictionCountByUser}
-          currentUserId={currentUser?.uid}
-          onToggleAdmin={handleToggleAdmin}
-          onToggleLocked={handleToggleLocked}
-          onChangeUnit={handleChangeUnit}
-        />
-      ) : null}
-
-      {activeTab === 'predictions' ? (
-        <PredictionsTab predictions={predictions} matches={displayMatches} users={sortedUsers} />
-      ) : null}
+      {activeTab === 'matches' ? <MatchesTab matches={displayMatches} roundFilter={matchRoundFilter} /> : null}
+      {activeTab === 'users' ? <UsersTab users={sortedUsers} predictionCountByUser={predictionCountByUser} currentUserId={currentUser?.uid} onToggleAdmin={handleToggleAdmin} onToggleLocked={handleToggleLocked} onChangeUnit={handleChangeUnit} /> : null}
+      {activeTab === 'predictions' ? <div className="space-y-5"><PredictionsTab predictions={predictions} matches={displayMatches} users={sortedUsers} />{predictionsHasMore ? <button id="admin-load-more-predictions" type="button" onClick={() => void loadMorePredictions()} disabled={isLoadingMore} className="inline-flex rounded-2xl bg-white/10 px-5 py-3 text-sm font-bold text-white transition hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-50">{isLoadingMore ? 'Đang tải...' : 'Tải thêm 100 kèo'}</button> : null}</div> : null}
     </div>
   );
 }
