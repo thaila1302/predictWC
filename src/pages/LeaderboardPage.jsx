@@ -91,7 +91,7 @@ export default function LeaderboardPage() {
                 <th className="px-4 py-3 sm:px-5 sm:py-4">Người chơi</th>
                 <th className="px-4 py-3 text-center sm:px-5 sm:py-4">Không dự đoán</th>
                 <th className="px-4 py-3 text-center sm:px-5 sm:py-4">Dự đoán sai</th>
-                <th className="px-4 py-3 text-center sm:px-5 sm:py-4">Số tiền đã ra đi</th>
+                <th className="px-4 py-3 text-center sm:px-5 sm:py-4">Lượng hải sản đã đánh bắt được</th>
               </tr>
             </thead>
             <tbody>
