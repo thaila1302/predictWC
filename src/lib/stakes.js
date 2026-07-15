@@ -6,10 +6,10 @@ const STAKES_BY_ROUND = {
   round_of_16: 20000,
   quarter_final: 30000,
   quarter_finals: 30000,
-  semi_final: 50000,
-  semi_finals: 50000,
-  third_place: 50000,
-  final: 100000
+  semi_final: 100000,
+  semi_finals: 100000,
+  third_place: 100000,
+  final: 200000
 };
 
 export function getMatchStake(match) {

@@ -164,11 +164,6 @@ export default function DevMatchEditor({ match }) {
     match.status
   ]);
 
-  const hasChanges = useMemo(() => {
-    const current = createDraftFromMatch(match);
-    return JSON.stringify(draft) !== JSON.stringify(current);
-  }, [draft, match]);
-
   const handleSave = async () => {
     const payload = {
       stage: match.stage || '',
@@ -227,7 +222,7 @@ export default function DevMatchEditor({ match }) {
           <button
             type="button"
             onClick={handleSave}
-            disabled={!hasChanges || saving}
+            disabled={saving}
             className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-400 to-violet-500 px-3 py-2 text-xs font-bold text-slate-950 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Save size={13} />
