@@ -7,7 +7,7 @@ const STAKES_BY_ROUND = {
   quarter_final: 30000,
   quarter_finals: 30000,
   semi_final: 100000,
-  semi_finals: 100000,
+  semi_finals: 50000,
   third_place: 100000,
   final: 200000
 };
